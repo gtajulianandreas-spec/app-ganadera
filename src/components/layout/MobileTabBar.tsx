@@ -22,6 +22,8 @@ import {
   Dna
 } from 'lucide-react';
 import type { AppTab } from './Sidebar';
+import type { UserRole } from '../../types/userRole';
+import { USER_ROLES } from '../../types/userRole';
 
 interface MobileTabBarProps {
   currentTab: AppTab;
@@ -35,6 +37,8 @@ interface MobileTabBarProps {
   onOpenAlerts?: () => void;
   onOpenShare?: () => void;
   onOpenScanner?: () => void;
+  currentRole?: UserRole;
+  onChangeRole?: (role: UserRole) => void;
   alertCount?: number;
   counts?: {
     animals: number;
@@ -55,6 +59,8 @@ export const MobileTabBar: React.FC<MobileTabBarProps> = ({
   onOpenAlerts,
   onOpenShare,
   onOpenScanner,
+  currentRole,
+  onChangeRole,
   alertCount = 0,
   counts
 }) => {
@@ -261,6 +267,36 @@ export const MobileTabBar: React.FC<MobileTabBarProps> = ({
                 <X className="w-5 h-5" />
               </button>
             </div>
+
+            {/* User Role Selector on Mobile */}
+            {onChangeRole && currentRole && (
+              <div className="bg-gray-50 border border-gray-200 p-2.5 rounded-2xl">
+                <div className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2 flex items-center justify-between">
+                  <span>Perfil de Usuario</span>
+                  <span className="text-ranch-700 font-extrabold bg-ranch-100 px-2 py-0.5 rounded-md text-[10px]">
+                    {USER_ROLES[currentRole].shortLabel}
+                  </span>
+                </div>
+                <div className="grid grid-cols-3 gap-1.5">
+                  {(Object.keys(USER_ROLES) as UserRole[]).map(roleKey => {
+                    const isSelected = currentRole === roleKey;
+                    return (
+                      <button
+                        key={roleKey}
+                        onClick={() => onChangeRole(roleKey)}
+                        className={`py-1.5 px-1.5 rounded-xl text-[11px] font-bold transition-all text-center truncate ${
+                          isSelected
+                            ? 'bg-ranch-600 text-white shadow-xs'
+                            : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-100'
+                        }`}
+                      >
+                        {USER_ROLES[roleKey].shortLabel}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
 
             {/* Share & Feedback Button for Remote Testers */}
             {onOpenShare && (

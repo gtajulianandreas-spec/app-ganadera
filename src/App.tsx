@@ -494,6 +494,8 @@ export const App: React.FC = () => {
         onOpenAlerts={() => setIsAlertsOpen(true)}
         onOpenShare={() => setIsShareOpen(true)}
         onOpenScanner={() => setIsChipScannerOpen(true)}
+        currentRole={currentRole}
+        onChangeRole={role => setCurrentRole(role)}
         alertCount={smartAlerts.length}
         counts={{
           animals: displayedAnimals.length,

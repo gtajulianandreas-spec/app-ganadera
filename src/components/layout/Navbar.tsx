@@ -147,10 +147,10 @@ export const Navbar: React.FC<NavbarProps> = ({
 
                 <div className="min-w-0 pr-1">
                   <div className="flex items-center space-x-1 sm:space-x-1.5">
-                    <span className="font-bold text-gray-900 text-xs sm:text-sm tracking-tight truncate max-w-[110px] sm:max-w-[180px]">
+                    <span className="font-bold text-gray-900 text-xs sm:text-sm tracking-tight truncate max-w-[120px] sm:max-w-[180px]">
                       {isGlobalView ? 'Todas las Fincas' : currentFarm?.name || 'Hacienda'}
                     </span>
-                    <span className="inline-flex items-center px-1.5 py-0.2 rounded text-[9px] sm:text-[10px] font-bold bg-ranch-100 text-ranch-800 border border-ranch-200 uppercase">
+                    <span className="hidden sm:inline-flex items-center px-1.5 py-0.2 rounded text-[9px] sm:text-[10px] font-bold bg-ranch-100 text-ranch-800 border border-ranch-200 uppercase">
                       {isGlobalView ? 'Global' : currentFarm?.purpose === 'milk' ? 'Leche' : currentFarm?.purpose === 'beef' ? 'Carne' : 'Doble'}
                     </span>
                     <ChevronDown className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-gray-400 group-hover:text-gray-700 transition-transform" />
@@ -242,8 +242,8 @@ export const Navbar: React.FC<NavbarProps> = ({
               )}
             </div>
 
-            {/* User Role Switcher Dropdown (Zootecnista, Inversionista, Admin, etc.) */}
-            <div className="relative" ref={roleDropdownRef}>
+            {/* User Role Switcher Dropdown (Desktop only in header; on mobile accessible in bottom drawer) */}
+            <div className="relative hidden md:block" ref={roleDropdownRef}>
               <button
                 onClick={() => setIsRoleDropdownOpen(!isRoleDropdownOpen)}
                 className="flex items-center space-x-1.5 px-2.5 py-1 rounded-xl bg-gray-100 hover:bg-gray-200/80 transition-colors text-xs font-bold text-gray-800 border border-gray-200"
@@ -305,38 +305,38 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* Action Toolbar */}
           <div className="flex items-center space-x-1.5 sm:space-x-2.5">
             
-            {/* Share & Feedback Button (Roadmap Fase 3) */}
+            {/* Share & Feedback Button (Desktop only; on mobile available in bottom drawer) */}
             {onOpenShare && (
               <button
                 onClick={onOpenShare}
-                className="inline-flex items-center px-2 sm:px-2.5 py-1.5 text-xs font-bold rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 transition-colors shadow-2xs"
+                className="hidden md:inline-flex items-center px-2.5 py-1.5 text-xs font-bold rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 transition-colors shadow-2xs"
                 title="Compartir con otros ganaderos y enviar sugerencias"
               >
-                <Share2 className="w-3.5 h-3.5 sm:mr-1 text-emerald-600" />
-                <span className="hidden sm:inline">Compartir</span>
+                <Share2 className="w-3.5 h-3.5 mr-1 text-emerald-600" />
+                <span>Compartir</span>
               </button>
             )}
 
-            {/* Universal Chip / RFID Scanner Button */}
+            {/* Universal Chip / RFID Scanner Button (Desktop only; on mobile available in search bar and bottom drawer) */}
             {onOpenScanner && (
               <button
                 onClick={onOpenScanner}
-                className="inline-flex items-center px-2 sm:px-2.5 py-1.5 text-xs font-bold rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 transition-colors shadow-2xs"
+                className="hidden md:inline-flex items-center px-2.5 py-1.5 text-xs font-bold rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 transition-colors shadow-2xs"
                 title="Lector Universal de Chip RFID, NFC y Aretes"
               >
-                <Radio className="w-3.5 h-3.5 sm:mr-1 text-amber-600 animate-pulse" />
-                <span className="hidden sm:inline">Lector Chip</span>
+                <Radio className="w-3.5 h-3.5 mr-1 text-amber-600 animate-pulse" />
+                <span>Lector Chip</span>
               </button>
             )}
 
-            {/* Smart Alerts Button with Counter */}
+            {/* Smart Alerts Button with Counter (Visible on all devices) */}
             {onOpenAlerts && (
               <button
                 onClick={onOpenAlerts}
-                className="relative inline-flex items-center p-1.5 sm:px-2.5 sm:py-1.5 text-xs font-bold rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-800 border border-gray-200 transition-colors"
+                className="relative inline-flex items-center p-2 sm:px-2.5 sm:py-1.5 text-xs font-bold rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-800 border border-gray-200 transition-colors shrink-0"
                 title="Centro de Alertas Ganaderas (Retiros, Secados, Partos, Celos)"
               >
-                <Bell className="w-3.5 h-3.5 sm:mr-1 text-gray-700" />
+                <Bell className="w-4 h-4 text-gray-700 sm:mr-1" />
                 <span className="hidden sm:inline">Alertas</span>
                 {alertCount > 0 && (
                   <span className="absolute -top-1 -right-1 sm:static sm:ml-1.5 px-1.5 py-0.2 rounded-full text-[10px] font-black bg-rose-600 text-white animate-pulse">
@@ -346,30 +346,30 @@ export const Navbar: React.FC<NavbarProps> = ({
               </button>
             )}
 
-            {/* QA Mobile Tester Button */}
+            {/* QA Mobile Tester Button (Desktop only) */}
             <button
               onClick={onOpenMobileTester}
-              className="inline-flex items-center px-2 sm:px-2.5 py-1.5 text-xs font-bold rounded-lg bg-purple-50 hover:bg-purple-100 text-purple-800 border border-purple-200 transition-colors shadow-2xs"
+              className="hidden lg:inline-flex items-center px-2.5 py-1.5 text-xs font-bold rounded-lg bg-purple-50 hover:bg-purple-100 text-purple-800 border border-purple-200 transition-colors shadow-2xs"
               title="Panel de Pruebas Móviles y Simuladores de Campo"
             >
-              <Smartphone className="w-3.5 h-3.5 sm:mr-1 text-purple-600" />
-              <span className="hidden sm:inline">Pruebas Móviles</span>
+              <Smartphone className="w-3.5 h-3.5 mr-1 text-purple-600" />
+              <span>Pruebas Móviles</span>
             </button>
 
-            {/* PWA Install Button (If available) */}
+            {/* PWA Install Button (If available, desktop only) */}
             {canInstallPwa && (
               <button
                 onClick={handleInstallClick}
-                className="inline-flex items-center px-2.5 py-1.5 text-xs font-bold rounded-lg bg-ranch-100 hover:bg-ranch-200 text-ranch-800 border border-ranch-300 transition-colors animate-pulse"
+                className="hidden lg:inline-flex items-center px-2.5 py-1.5 text-xs font-bold rounded-lg bg-ranch-100 hover:bg-ranch-200 text-ranch-800 border border-ranch-300 transition-colors animate-pulse"
                 title="Instalar App en este dispositivo"
               >
-                <Download className="w-3.5 h-3.5 sm:mr-1 text-ranch-700" />
-                <span className="hidden sm:inline">Instalar App</span>
+                <Download className="w-3.5 h-3.5 mr-1 text-ranch-700" />
+                <span>Instalar App</span>
               </button>
             )}
 
-            {/* Sync State Badge */}
-            <div className="flex items-center bg-gray-50 border border-gray-200 rounded-lg px-2 py-1 text-xs font-medium">
+            {/* Sync State Badge (Desktop only) */}
+            <div className="hidden md:flex items-center bg-gray-50 border border-gray-200 rounded-lg px-2 py-1 text-xs font-medium">
               {syncStatus === 'offline' ? (
                 <span className="flex items-center text-amber-700" title="Sin conexión - Datos guardados en local">
                   <WifiOff className="w-3.5 h-3.5 text-amber-600 sm:mr-1" />
@@ -418,10 +418,12 @@ export const Navbar: React.FC<NavbarProps> = ({
             {/* AI Assistant Button */}
             <button
               onClick={onOpenAi}
-              className="inline-flex items-center px-2.5 sm:px-3.5 py-1.5 text-xs font-bold rounded-lg bg-gradient-to-r from-ranch-600 to-emerald-600 text-white shadow-xs hover:from-ranch-700 hover:to-emerald-700 transition-all hover:shadow"
+              className="inline-flex items-center p-2 sm:px-3 sm:py-1.5 text-xs font-bold rounded-xl bg-gradient-to-r from-ranch-600 to-emerald-600 text-white shadow-xs hover:from-ranch-700 hover:to-emerald-700 transition-all shrink-0"
+              title="Asistente de Inteligencia Artificial"
             >
-              <Sparkles className="w-3.5 h-3.5 sm:mr-1.5 animate-pulse text-yellow-300" />
-              <span className="hidden sm:inline">Asistente</span> IA
+              <Sparkles className="w-4 h-4 sm:mr-1.5 animate-pulse text-yellow-300" />
+              <span className="hidden sm:inline">Asistente</span>
+              <span className="text-[11px] font-extrabold sm:text-xs">IA</span>
             </button>
           </div>
 
