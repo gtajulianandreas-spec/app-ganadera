@@ -14,5 +14,20 @@ export default defineConfig({
     port: 4173,
     allowedHosts: true,
     host: true
+  },
+  build: {
+    chunkSizeWarningLimit: 1000,
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('recharts') || id.includes('d3')) return 'vendor-charts';
+            if (id.includes('xlsx')) return 'vendor-excel';
+            if (id.includes('dexie')) return 'vendor-db';
+            if (id.includes('lucide-react')) return 'vendor-icons';
+          }
+        }
+      }
+    }
   }
 });
