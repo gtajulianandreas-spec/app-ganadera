@@ -1,0 +1,20 @@
+{
+  "appId": "com.appganadera.pro",
+  "appName": "APP GANADERA",
+  "webDir": "dist",
+  "bundledWebRuntime": false,
+  "server": {
+    "androidScheme": "https"
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 1500,
+      "backgroundColor": "#15803d",
+      "showSpinner": false
+    },
+    "StatusBar": {
+      "style": "DARK",
+      "backgroundColor": "#15803d"
+    }
+  }
+}

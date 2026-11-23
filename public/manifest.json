@@ -1,0 +1,60 @@
+{
+  "name": "APP GANADERA - Control y Gestión Pecuaria Pro",
+  "short_name": "AppGanadera",
+  "description": "Sistema profesional de gestión de ganado, control lechero, ceba, reproducción y finanzas offline.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone"],
+  "orientation": "portrait",
+  "background_color": "#f8fafc",
+  "theme_color": "#15803d",
+  "icons": [
+    {
+      "src": "/icons/icon-96.png",
+      "sizes": "96x96",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Nuevo Animal",
+      "short_name": "Nuevo",
+      "description": "Registrar una nueva cabeza de ganado",
+      "url": "/?tab=animals&action=new",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Buscar por Foto",
+      "short_name": "Foto",
+      "description": "Identificar ganado con la cámara",
+      "url": "/?tab=animals&action=photo_search",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Asistente IA",
+      "short_name": "IA Ganadera",
+      "description": "Consultar al Asistente Inteligente",
+      "url": "/?action=ai_chat",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    }
+  ],
+  "categories": ["business", "productivity", "utilities"]
+}
