@@ -162,8 +162,8 @@ export const ReproductionDashboard: React.FC<ReproductionDashboardProps> = ({
         <div>
           <h1 className="text-xl font-bold text-gray-900 tracking-tight flex items-center space-x-2">
             <span>Control Reproductivo Avanzado</span>
-            <span className="text-xs font-semibold bg-amber-100 text-amber-800 px-2.5 py-0.5 rounded-full">
-              {pregnantEvents.length} Gestaciones Activas
+            <span className="text-xs font-semibold bg-amber-100 text-amber-800 px-2.5 py-0.5 rounded-full whitespace-nowrap">
+              {pregnantEvents.length} {pregnantEvents.length === 1 ? 'Gestación Activa' : 'Gestaciones Activas'}
             </span>
           </h1>
           <p className="text-xs text-gray-500 mt-1">
@@ -213,15 +213,15 @@ export const ReproductionDashboard: React.FC<ReproductionDashboardProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         
         {/* Card 1: Secado Obligatorio */}
-        <div className="bg-white rounded-2xl border border-amber-200 p-4 shadow-xs flex flex-col justify-between">
+        <div className="bg-white rounded-2xl border border-gray-200 p-4 shadow-xs flex flex-col justify-between">
           <div>
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-bold text-amber-900 uppercase tracking-wide flex items-center space-x-1">
-                <AlertTriangle className="w-3.5 h-3.5 text-amber-600 mr-1" />
-                Alerta de Secado (60 Días)
+            <div className="flex items-center justify-between gap-2 mb-2">
+              <span className="text-xs font-bold text-gray-800 uppercase tracking-wide flex items-center">
+                <AlertTriangle className="w-3.5 h-3.5 text-amber-600 mr-1.5 shrink-0" />
+                Alerta de Secado (60d)
               </span>
-              <span className="text-xs font-extrabold bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full">
-                {dryOffAlerts.length} vacas
+              <span className="text-[11px] font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full whitespace-nowrap shrink-0 tabular-nums">
+                {dryOffAlerts.length} {dryOffAlerts.length === 1 ? 'vaca' : 'vacas'}
               </span>
             </div>
             <p className="text-xs text-gray-600">
@@ -229,13 +229,13 @@ export const ReproductionDashboard: React.FC<ReproductionDashboardProps> = ({
             </p>
           </div>
 
-          <div className="mt-3 pt-3 border-t border-amber-100 space-y-1.5">
+          <div className="mt-3 pt-3 border-t border-gray-100 space-y-1.5">
             {dryOffAlerts.slice(0, 3).map(r => {
               const a = animalMap.get(r.animalId);
               return (
-                <div key={r.id} className="flex items-center justify-between text-xs bg-amber-50/60 p-2 rounded-xl">
+                <div key={r.id} className="flex items-center justify-between text-xs bg-amber-50/70 p-2 rounded-xl">
                   <span className="font-bold text-gray-800">{a?.earTagCode} ({a?.name || 'Vaca'})</span>
-                  <span className="font-semibold text-amber-800">Fecha: {r.mandatoryDryOffDate}</span>
+                  <span className="font-semibold text-amber-800 tabular-nums">Fecha: {r.mandatoryDryOffDate}</span>
                 </div>
               );
             })}
@@ -243,15 +243,15 @@ export const ReproductionDashboard: React.FC<ReproductionDashboardProps> = ({
         </div>
 
         {/* Card 2: Partos Inminentes */}
-        <div className="bg-white rounded-2xl border border-blue-200 p-4 shadow-xs flex flex-col justify-between">
+        <div className="bg-white rounded-2xl border border-gray-200 p-4 shadow-xs flex flex-col justify-between">
           <div>
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-bold text-blue-900 uppercase tracking-wide flex items-center space-x-1">
-                <Baby className="w-3.5 h-3.5 text-blue-600 mr-1" />
-                Partos en los Próximos 45 Días
+            <div className="flex items-center justify-between gap-2 mb-2">
+              <span className="text-xs font-bold text-gray-800 uppercase tracking-wide flex items-center">
+                <Baby className="w-3.5 h-3.5 text-blue-600 mr-1.5 shrink-0" />
+                Partos Próximos (45d)
               </span>
-              <span className="text-xs font-extrabold bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">
-                {upcomingCalvings.length} partos
+              <span className="text-[11px] font-bold bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full whitespace-nowrap shrink-0 tabular-nums">
+                {upcomingCalvings.length} {upcomingCalvings.length === 1 ? 'parto' : 'partos'}
               </span>
             </div>
             <p className="text-xs text-gray-600">
@@ -259,13 +259,13 @@ export const ReproductionDashboard: React.FC<ReproductionDashboardProps> = ({
             </p>
           </div>
 
-          <div className="mt-3 pt-3 border-t border-blue-100 space-y-1.5">
+          <div className="mt-3 pt-3 border-t border-gray-100 space-y-1.5">
             {upcomingCalvings.slice(0, 3).map(r => {
               const a = animalMap.get(r.animalId);
               return (
-                <div key={r.id} className="flex items-center justify-between text-xs bg-blue-50/60 p-2 rounded-xl">
+                <div key={r.id} className="flex items-center justify-between text-xs bg-blue-50/70 p-2 rounded-xl">
                   <span className="font-bold text-gray-800">{a?.earTagCode} ({a?.name || 'Vaca'})</span>
-                  <span className="font-semibold text-blue-800">{r.projectedCalvingDate}</span>
+                  <span className="font-semibold text-blue-800 tabular-nums">{r.projectedCalvingDate}</span>
                 </div>
               );
             })}
@@ -273,14 +273,14 @@ export const ReproductionDashboard: React.FC<ReproductionDashboardProps> = ({
         </div>
 
         {/* Card 3: Semáforo de Celos Recurrentes */}
-        <div className="bg-white rounded-2xl border border-rose-200 p-4 shadow-xs flex flex-col justify-between">
+        <div className="bg-white rounded-2xl border border-gray-200 p-4 shadow-xs flex flex-col justify-between">
           <div>
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-bold text-rose-900 uppercase tracking-wide flex items-center space-x-1">
-                <BellRing className="w-3.5 h-3.5 text-rose-600 mr-1" />
-                Alerta de Celo Cíclico (18-24d)
+            <div className="flex items-center justify-between gap-2 mb-2">
+              <span className="text-xs font-bold text-gray-800 uppercase tracking-wide flex items-center">
+                <BellRing className="w-3.5 h-3.5 text-rose-600 mr-1.5 shrink-0" />
+                Celo Cíclico (18-24d)
               </span>
-              <span className="text-xs font-extrabold bg-rose-100 text-rose-800 px-2 py-0.5 rounded-full">
+              <span className="text-[11px] font-bold bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full whitespace-nowrap shrink-0 tabular-nums">
                 {heatWatchList.length} en ventana
               </span>
             </div>
@@ -289,7 +289,7 @@ export const ReproductionDashboard: React.FC<ReproductionDashboardProps> = ({
             </p>
           </div>
 
-          <div className="mt-3 pt-3 border-t border-rose-100 space-y-1.5">
+          <div className="mt-3 pt-3 border-t border-gray-100 space-y-1.5">
             {heatWatchList.length === 0 ? (
               <p className="text-xs text-gray-400 italic">No hay vacas en ventana de celo hoy.</p>
             ) : (

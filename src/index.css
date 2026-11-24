@@ -4,10 +4,22 @@
 
 @layer base {
   body {
-    @apply antialiased bg-gray-50 text-gray-900;
+    @apply antialiased bg-gray-50/90 text-gray-900 font-sans;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
     -webkit-tap-highlight-color: transparent;
   }
+
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible {
+    @apply outline-none ring-2 ring-ranch-500/40 ring-offset-1;
+  }
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
 }
 
 /* Safe area support for mobile phone notches and home indicator */

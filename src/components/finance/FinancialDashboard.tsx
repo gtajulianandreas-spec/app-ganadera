@@ -99,7 +99,7 @@ export const FinancialDashboard: React.FC<FinancialDashboardProps> = ({
 
         <button
           onClick={() => setShowAddModal(true)}
-          className="inline-flex items-center px-4 py-2 text-xs font-bold rounded-xl bg-ranch-600 hover:bg-ranch-700 text-white transition-colors shadow-xs"
+          className="inline-flex items-center justify-center px-4 py-2 text-xs font-bold rounded-xl bg-ranch-600 hover:bg-ranch-700 text-white transition-colors shadow-xs whitespace-nowrap shrink-0"
         >
           <Plus className="w-4 h-4 mr-1.5" />
           Registrar Movimiento
@@ -107,63 +107,74 @@ export const FinancialDashboard: React.FC<FinancialDashboardProps> = ({
       </div>
 
       {/* KPI Unit Economics Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         
         {/* Cost per Liter */}
-        <div className="bg-white rounded-2xl border border-blue-200 p-4 shadow-xs">
-          <div className="flex items-center justify-between text-blue-700 mb-1">
-            <span className="text-xs font-bold uppercase tracking-wider">Costo por Litro</span>
-            <Milk className="w-4 h-4" />
+        <div className="bg-white rounded-2xl border border-gray-200 p-4 shadow-xs">
+          <div className="flex items-center justify-between text-gray-500 mb-1.5">
+            <span className="text-xs font-semibold uppercase tracking-wider">Costo por Litro</span>
+            <Milk className="w-4 h-4 text-blue-600" />
           </div>
-          <div className="text-2xl font-black text-gray-900 tracking-tight">
-            ${economics.costPerLiterMilk} <span className="text-xs font-semibold text-gray-500">USD/L</span>
+          <div className="text-2xl font-extrabold text-gray-900 tracking-tight tabular-nums">
+            ${economics.costPerLiterMilk.toFixed(2)} <span className="text-xs font-semibold text-gray-500">USD/L</span>
           </div>
-          <div className="mt-2 text-xs flex items-center justify-between text-gray-600 pt-2 border-t border-blue-50">
+          <div className="mt-2.5 text-xs flex items-center justify-between text-gray-600 pt-2.5 border-t border-gray-100 tabular-nums">
             <span>Precio venta: $0.58/L</span>
-            <span className="font-bold text-emerald-600">Margen: +${economics.grossMarginPerLiterMilk}</span>
+            <span className={`font-bold ${economics.grossMarginPerLiterMilk >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+              {economics.grossMarginPerLiterMilk >= 0
+                ? `+$${economics.grossMarginPerLiterMilk.toFixed(2)}`
+                : `-$${Math.abs(economics.grossMarginPerLiterMilk).toFixed(2)}`}
+            </span>
           </div>
         </div>
 
         {/* Cost per Kg Beef Gain */}
-        <div className="bg-white rounded-2xl border border-amber-200 p-4 shadow-xs">
-          <div className="flex items-center justify-between text-amber-700 mb-1">
-            <span className="text-xs font-bold uppercase tracking-wider">Costo por Kg Carne</span>
-            <Scale className="w-4 h-4" />
+        <div className="bg-white rounded-2xl border border-gray-200 p-4 shadow-xs">
+          <div className="flex items-center justify-between text-gray-500 mb-1.5">
+            <span className="text-xs font-semibold uppercase tracking-wider">Costo por Kg Carne</span>
+            <Scale className="w-4 h-4 text-amber-600" />
           </div>
-          <div className="text-2xl font-black text-gray-900 tracking-tight">
-            ${economics.costPerKgGain} <span className="text-xs font-semibold text-gray-500">USD/kg</span>
+          <div className="text-2xl font-extrabold text-gray-900 tracking-tight tabular-nums">
+            ${economics.costPerKgGain.toFixed(2)} <span className="text-xs font-semibold text-gray-500">USD/kg</span>
           </div>
-          <div className="mt-2 text-xs flex items-center justify-between text-gray-600 pt-2 border-t border-amber-50">
+          <div className="mt-2.5 text-xs flex items-center justify-between text-gray-600 pt-2.5 border-t border-gray-100 tabular-nums">
             <span>Precio pie: $2.10/kg</span>
-            <span className="font-bold text-emerald-600">Margen: +${economics.grossMarginPerKgBeef}</span>
+            <span className={`font-bold ${economics.grossMarginPerKgBeef >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+              {economics.grossMarginPerKgBeef >= 0
+                ? `+$${economics.grossMarginPerKgBeef.toFixed(2)}`
+                : `-$${Math.abs(economics.grossMarginPerKgBeef).toFixed(2)}`}
+            </span>
           </div>
         </div>
 
         {/* Net Profit */}
-        <div className="bg-white rounded-2xl border border-emerald-200 p-4 shadow-xs">
-          <div className="flex items-center justify-between text-emerald-700 mb-1">
-            <span className="text-xs font-bold uppercase tracking-wider">Utilidad Neta Real</span>
-            <TrendingUp className="w-4 h-4" />
+        <div className="bg-white rounded-2xl border border-gray-200 p-4 shadow-xs">
+          <div className="flex items-center justify-between text-gray-500 mb-1.5">
+            <span className="text-xs font-semibold uppercase tracking-wider">Utilidad Neta Real</span>
+            <TrendingUp className={`w-4 h-4 ${economics.netProfit >= 0 ? 'text-emerald-600' : 'text-rose-600'}`} />
           </div>
-          <div className="text-2xl font-black text-emerald-700 tracking-tight">
-            ${economics.netProfit.toLocaleString()} <span className="text-xs font-semibold text-gray-500">USD</span>
+          <div className={`text-2xl font-extrabold tracking-tight tabular-nums ${economics.netProfit >= 0 ? 'text-emerald-700' : 'text-rose-600'}`}>
+            {economics.netProfit >= 0 ? `$${economics.netProfit.toLocaleString()}` : `-$${Math.abs(economics.netProfit).toLocaleString()}`}{' '}
+            <span className="text-xs font-semibold text-gray-500">USD</span>
           </div>
-          <div className="mt-2 text-xs flex items-center justify-between text-gray-600 pt-2 border-t border-emerald-50">
+          <div className="mt-2.5 text-xs flex items-center justify-between text-gray-600 pt-2.5 border-t border-gray-100 tabular-nums">
             <span>Margen neto</span>
-            <span className="font-bold text-emerald-700">{economics.profitMarginPercent}%</span>
+            <span className={`font-bold ${economics.profitMarginPercent >= 0 ? 'text-emerald-700' : 'text-rose-600'}`}>
+              {economics.profitMarginPercent}%
+            </span>
           </div>
         </div>
 
         {/* Break-even Point */}
-        <div className="bg-white rounded-2xl border border-purple-200 p-4 shadow-xs">
-          <div className="flex items-center justify-between text-purple-700 mb-1">
-            <span className="text-xs font-bold uppercase tracking-wider">Punto de Equilibrio</span>
-            <PieIcon className="w-4 h-4" />
+        <div className="bg-white rounded-2xl border border-gray-200 p-4 shadow-xs">
+          <div className="flex items-center justify-between text-gray-500 mb-1.5">
+            <span className="text-xs font-semibold uppercase tracking-wider">Punto de Equilibrio</span>
+            <PieIcon className="w-4 h-4 text-ranch-600" />
           </div>
-          <div className="text-2xl font-black text-gray-900 tracking-tight">
-            {economics.breakEvenMilkLitersMonthly.toLocaleString()} <span className="text-xs font-semibold text-gray-500">Litros/mes</span>
+          <div className="text-2xl font-extrabold text-gray-900 tracking-tight tabular-nums">
+            {economics.breakEvenMilkLitersMonthly.toLocaleString()} <span className="text-xs font-semibold text-gray-500">L/mes</span>
           </div>
-          <div className="mt-2 text-xs text-gray-500 pt-2 border-t border-purple-50">
+          <div className="mt-2.5 text-xs text-gray-500 pt-2.5 border-t border-gray-100">
             Volumen mínimo para cubrir costos fijos
           </div>
         </div>
@@ -213,29 +224,40 @@ export const FinancialDashboard: React.FC<FinancialDashboardProps> = ({
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {financials.map(rec => (
+              {financials.map(rec => {
+                const categoryLabels: Record<string, string> = {
+                  milk_sale: 'Venta de Leche',
+                  animal_sale: 'Venta de Ganado',
+                  feed_supplement: 'Alimento y Suplementos',
+                  veterinary_medicine: 'Sanidad y Medicamentos',
+                  labor_payroll: 'Nómina y Mano de Obra',
+                  pasture_fertilizer: 'Potreros y Fertilización',
+                  other: 'Otros'
+                };
+                return (
                 <tr key={rec.id} className="hover:bg-gray-50">
-                  <td className="py-2.5 px-4 font-medium text-gray-700">{rec.date}</td>
-                  <td className="py-2.5 px-4">
+                  <td className="py-2.5 px-4 font-medium text-gray-700 whitespace-nowrap tabular-nums">{rec.date}</td>
+                  <td className="py-2.5 px-4 whitespace-nowrap">
                     <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold ${
                       rec.type === 'income' ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
                     }`}>
                       {rec.type === 'income' ? 'INGRESO' : 'EGRESO'}
                     </span>
                   </td>
-                  <td className="py-2.5 px-4 text-gray-600 capitalize">
-                    {rec.category.replace('_', ' ')}
+                  <td className="py-2.5 px-4 text-gray-600 whitespace-nowrap">
+                    {categoryLabels[rec.category] || rec.category.replace('_', ' ')}
                   </td>
                   <td className="py-2.5 px-4 text-gray-800 font-medium max-w-sm truncate">
                     {rec.description}
                   </td>
-                  <td className={`py-2.5 px-4 text-right font-extrabold ${
+                  <td className={`py-2.5 px-4 text-right font-extrabold whitespace-nowrap tabular-nums ${
                     rec.type === 'income' ? 'text-emerald-600' : 'text-rose-600'
                   }`}>
                     {rec.type === 'income' ? '+' : '-'}${rec.amount.toLocaleString()}
                   </td>
                 </tr>
-              ))}
+                );
+              })}
             </tbody>
           </table>
         </div>

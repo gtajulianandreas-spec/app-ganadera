@@ -36,8 +36,8 @@ export const MilkRecordsView: React.FC<MilkRecordsViewProps> = ({
 
   const animalMap = useMemo(() => new Map(animals.map(a => [a.id, a])), [animals]);
 
-  // Aggregate milk by date for charts
-  const { chartData, totalLiters, avgPerShift } = useMemo(() => {
+  // Aggregate milk by date for charts (sorted chronologically)
+  const { chartData, sortedMilkings, totalLiters, avgPerShift } = useMemo(() => {
     const dateMap = new Map<string, number>();
     let sumLiters = 0;
     for (const m of milkings) {
@@ -45,10 +45,16 @@ export const MilkRecordsView: React.FC<MilkRecordsViewProps> = ({
       sumLiters += m.liters;
     }
     const data = Array.from(dateMap.entries())
-      .map(([d, l]) => ({ fecha: d.slice(5), litros: Number(l.toFixed(1)) }))
-      .slice(-14);
+      .sort(([dateA], [dateB]) => dateA.localeCompare(dateB))
+      .slice(-14)
+      .map(([d, l]) => ({ fecha: d.slice(5), litros: Number(l.toFixed(1)) }));
+    const sorted = [...milkings].sort((a, b) => {
+      const dateCmp = b.date.localeCompare(a.date);
+      if (dateCmp !== 0) return dateCmp;
+      return a.shift === 'PM' && b.shift === 'AM' ? -1 : a.shift === 'AM' && b.shift === 'PM' ? 1 : 0;
+    });
     const avg = milkings.length > 0 ? (sumLiters / milkings.length).toFixed(1) : '0';
-    return { chartData: data, totalLiters: sumLiters, avgPerShift: avg };
+    return { chartData: data, sortedMilkings: sorted, totalLiters: sumLiters, avgPerShift: avg };
   }, [milkings]);
 
   const handleSave = async (e: React.FormEvent) => {
@@ -123,7 +129,7 @@ export const MilkRecordsView: React.FC<MilkRecordsViewProps> = ({
                 contentStyle={{ backgroundColor: '#ffffff', borderRadius: '12px', border: '1px solid #e2e8f0', fontSize: '12px' }}
                 formatter={(val: any) => [`${val} Litros`, 'Producción']}
               />
-              <Area type="monotone" dataKey="litros" stroke="#2563eb" strokeWidth={2.5} fillOpacity={1} fill="url(#milkColor)" />
+              <Area type="monotone" dataKey="litros" stroke="#2563eb" strokeWidth={2.5} fillOpacity={1} fill="url(#milkColor)" isAnimationActive={false} />
             </AreaChart>
           </ResponsiveContainer>
         </div>
@@ -150,22 +156,25 @@ export const MilkRecordsView: React.FC<MilkRecordsViewProps> = ({
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {milkings.slice(0, 15).map(m => {
+              {sortedMilkings.slice(0, 15).map(m => {
                 const a = animalMap.get(m.animalId);
                 return (
                   <tr key={m.id} className="hover:bg-gray-50">
-                    <td className="py-2.5 px-4 font-medium text-gray-700">{m.date}</td>
-                    <td className="py-2.5 px-4 font-bold text-gray-900">
-                      {a?.earTagCode} <span className="font-normal text-gray-500 text-[11px]">({a?.name || 'Vaca'})</span>
+                    <td className="py-2.5 px-4 font-medium text-gray-700 whitespace-nowrap tabular-nums">{m.date}</td>
+                    <td className="py-2.5 px-4 font-bold text-gray-900 whitespace-nowrap">
+                      <span className="font-mono">{a?.earTagCode}</span>{' '}
+                      <span className="font-normal text-gray-500 text-[11px]">({a?.name || 'Vaca'})</span>
                     </td>
-                    <td className="py-2.5 px-4">
-                      <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-blue-700">
+                    <td className="py-2.5 px-4 whitespace-nowrap">
+                      <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${
+                        m.shift === 'AM' ? 'bg-amber-50 text-amber-800 border border-amber-200' : 'bg-indigo-50 text-indigo-800 border border-indigo-200'
+                      }`}>
                         {m.shift}
                       </span>
                     </td>
-                    <td className="py-2.5 px-4 text-right font-extrabold text-blue-600">{m.liters.toFixed(1)} L</td>
-                    <td className="py-2.5 px-4 text-right text-gray-600">{m.fatPercentage ? `${m.fatPercentage}%` : '—'}</td>
-                    <td className="py-2.5 px-4 text-right text-gray-500">{m.calfConsumptionLiters ? `${m.calfConsumptionLiters} L` : '0 L'}</td>
+                    <td className="py-2.5 px-4 text-right font-extrabold text-blue-600 tabular-nums whitespace-nowrap">{m.liters.toFixed(1)} L</td>
+                    <td className="py-2.5 px-4 text-right text-gray-600 tabular-nums whitespace-nowrap">{m.fatPercentage ? `${m.fatPercentage}%` : '—'}</td>
+                    <td className="py-2.5 px-4 text-right text-gray-500 tabular-nums whitespace-nowrap">{m.calfConsumptionLiters ? `${m.calfConsumptionLiters} L` : '0 L'}</td>
                     <td className="py-2.5 px-4 text-gray-500">{m.milkerName || '—'}</td>
                   </tr>
                 );

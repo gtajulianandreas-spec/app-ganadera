@@ -97,7 +97,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     };
   }, []);
 
-  // Close dropdowns on outside click
+  // Close dropdowns on outside click or Escape key
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
@@ -110,8 +110,19 @@ export const Navbar: React.FC<NavbarProps> = ({
         setIsToolsDropdownOpen(false);
       }
     };
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsFarmDropdownOpen(false);
+        setIsRoleDropdownOpen(false);
+        setIsToolsDropdownOpen(false);
+      }
+    };
     document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
   }, []);
 
   const handleManualSync = async () => {
@@ -204,7 +215,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                         <Globe className="w-3.5 h-3.5" />
                       </div>
                       <div>
-                        <div className="font-semibold text-gray-900">🌐 Todas las Fincas (Global)</div>
+                        <div className="font-semibold text-gray-900">Todas las Fincas (Global)</div>
                         <div className="text-[11px] text-gray-500">Métricas consolidadas de todo el hato</div>
                       </div>
                     </div>
@@ -225,16 +236,18 @@ export const Navbar: React.FC<NavbarProps> = ({
                             setIsFarmDropdownOpen(false);
                           }}
                           className={`w-full flex items-center justify-between px-3.5 py-2 text-xs text-left hover:bg-gray-50 transition-colors ${
-                            isSelected ? 'bg-ranch-50 font-bold text-ranch-900' : 'text-gray-700'
+                            isSelected ? 'bg-ranch-50/90 font-semibold text-ranch-900' : 'text-gray-700'
                           }`}
                         >
                           <div className="flex items-center space-x-2.5 truncate">
-                            <div className="w-6 h-6 rounded-md bg-gray-100 flex items-center justify-center text-gray-600 shrink-0">
+                            <div className={`w-6 h-6 rounded-md flex items-center justify-center shrink-0 ${
+                              isSelected ? 'bg-ranch-100 text-ranch-700' : 'bg-gray-100 text-gray-600'
+                            }`}>
                               <Building2 className="w-3.5 h-3.5" />
                             </div>
                             <div className="truncate">
                               <div className="font-semibold text-gray-900 truncate">{farm.name}</div>
-                              <div className="text-[11px] text-gray-400 truncate">
+                              <div className={`text-[11px] truncate ${isSelected ? 'text-ranch-700/80' : 'text-gray-500'}`}>
                                 {farm.areaHectares} Ha • {farm.location || farm.country}
                               </div>
                             </div>

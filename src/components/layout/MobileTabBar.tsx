@@ -81,7 +81,7 @@ export const MobileTabBar: React.FC<MobileTabBarProps> = ({
   return (
     <>
       {/* Bottom Bar: Visible only on mobile screens (hidden on md+) */}
-      <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-gray-200 px-2 py-1 flex items-center justify-around md:hidden shadow-lg safe-bottom">
+      <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-gray-200 px-2 pt-1.5 pb-1.5 flex items-end justify-around md:hidden shadow-lg safe-bottom">
         {/* Tab 1: Ganado */}
         <button
           onClick={() => {
@@ -89,19 +89,19 @@ export const MobileTabBar: React.FC<MobileTabBarProps> = ({
             setIsActionSheetOpen(false);
             setIsMoreMenuOpen(false);
           }}
-          className={`flex flex-col items-center justify-center flex-1 py-1.5 transition-colors relative ${
+          className={`flex flex-col items-center justify-end flex-1 py-1 transition-colors relative ${
             currentTab === 'animals' ? 'text-ranch-600 font-bold' : 'text-gray-500'
           }`}
         >
-          <div className="relative">
+          <div className="relative inline-flex items-center justify-center w-6 h-6">
             <Users className="w-5 h-5" />
             {counts?.animals ? (
-              <span className="absolute -top-1 -right-2 text-[9px] font-bold px-1 py-0.2 bg-ranch-100 text-ranch-800 rounded-full">
+              <span className="absolute -top-1.5 -right-2.5 min-w-[16px] h-4 px-1 flex items-center justify-center text-[9px] font-bold bg-ranch-100 text-ranch-800 rounded-full ring-2 ring-white tabular-nums">
                 {counts.animals}
               </span>
             ) : null}
           </div>
-          <span className="text-[10px] mt-1">Ganado</span>
+          <span className="text-[10px] mt-1 leading-none">Ganado</span>
         </button>
 
         {/* Tab 2: Reproducción */}
@@ -111,34 +111,34 @@ export const MobileTabBar: React.FC<MobileTabBarProps> = ({
             setIsActionSheetOpen(false);
             setIsMoreMenuOpen(false);
           }}
-          className={`flex flex-col items-center justify-center flex-1 py-1.5 transition-colors relative ${
+          className={`flex flex-col items-center justify-end flex-1 py-1 transition-colors relative ${
             currentTab === 'reproduction' ? 'text-ranch-600 font-bold' : 'text-gray-500'
           }`}
         >
-          <div className="relative">
+          <div className="relative inline-flex items-center justify-center w-6 h-6">
             <GitBranch className="w-5 h-5" />
             {counts?.pregnant ? (
-              <span className="absolute -top-1 -right-2 text-[9px] font-bold px-1 py-0.2 bg-amber-100 text-amber-800 rounded-full">
+              <span className="absolute -top-1.5 -right-2.5 min-w-[16px] h-4 px-1 flex items-center justify-center text-[9px] font-bold bg-amber-100 text-amber-800 rounded-full ring-2 ring-white tabular-nums">
                 {counts.pregnant}
               </span>
             ) : null}
           </div>
-          <span className="text-[10px] mt-1">Preñez</span>
+          <span className="text-[10px] mt-1 leading-none">Preñez</span>
         </button>
 
-        {/* Center Quick Action Floating Button (FAB) */}
-        <div className="flex flex-col items-center justify-center -mt-6">
+        {/* Center Quick Action Button */}
+        <div className="flex flex-col items-center justify-end flex-1 py-1">
           <button
             onClick={() => {
               setIsActionSheetOpen(true);
               setIsMoreMenuOpen(false);
             }}
-            className="w-13 h-13 rounded-full bg-gradient-to-tr from-ranch-600 to-emerald-600 text-white flex items-center justify-center shadow-lg active:scale-95 transition-transform border-4 border-white"
+            className="w-9 h-9 -mt-3 rounded-full bg-ranch-600 hover:bg-ranch-700 text-white flex items-center justify-center shadow-md active:scale-95 transition-transform ring-4 ring-white"
             title="Acción rápida de potrero"
           >
-            <Plus className="w-6 h-6" />
+            <Plus className="w-5 h-5" />
           </button>
-          <span className="text-[9px] text-gray-500 font-semibold mt-0.5">Acción</span>
+          <span className="text-[10px] text-gray-600 font-semibold mt-1 leading-none">Acción</span>
         </div>
 
         {/* Tab 3: Ordeño */}
@@ -148,19 +148,19 @@ export const MobileTabBar: React.FC<MobileTabBarProps> = ({
             setIsActionSheetOpen(false);
             setIsMoreMenuOpen(false);
           }}
-          className={`flex flex-col items-center justify-center flex-1 py-1.5 transition-colors relative ${
+          className={`flex flex-col items-center justify-end flex-1 py-1 transition-colors relative ${
             currentTab === 'milking' ? 'text-ranch-600 font-bold' : 'text-gray-500'
           }`}
         >
-          <div className="relative">
+          <div className="relative inline-flex items-center justify-center w-6 h-6">
             <Milk className="w-5 h-5" />
             {counts?.milking ? (
-              <span className="absolute -top-1 -right-2 text-[9px] font-bold px-1 py-0.2 bg-blue-100 text-blue-800 rounded-full">
+              <span className="absolute -top-1.5 -right-2.5 min-w-[16px] h-4 px-1 flex items-center justify-center text-[9px] font-bold bg-blue-100 text-blue-800 rounded-full ring-2 ring-white tabular-nums">
                 {counts.milking}
               </span>
             ) : null}
           </div>
-          <span className="text-[10px] mt-1">Ordeño</span>
+          <span className="text-[10px] mt-1 leading-none">Ordeño</span>
         </button>
 
         {/* Tab 4: Menú Más */}
@@ -169,14 +169,14 @@ export const MobileTabBar: React.FC<MobileTabBarProps> = ({
             setIsMoreMenuOpen(true);
             setIsActionSheetOpen(false);
           }}
-          className={`flex flex-col items-center justify-center flex-1 py-1.5 transition-colors relative ${
+          className={`flex flex-col items-center justify-end flex-1 py-1 transition-colors relative ${
             isMoreMenuOpen ? 'text-ranch-600 font-bold' : 'text-gray-500'
           }`}
         >
-          <div className="relative">
+          <div className="relative inline-flex items-center justify-center w-6 h-6">
             <Menu className="w-5 h-5" />
             {alertCount > 0 && (
-              <span className="absolute -top-1 -right-2 text-[9px] font-bold px-1 py-0.2 bg-rose-600 text-white rounded-full animate-pulse">
+              <span className="absolute -top-1.5 -right-2.5 min-w-[16px] h-4 px-1 flex items-center justify-center text-[9px] font-bold bg-rose-600 text-white rounded-full ring-2 ring-white tabular-nums">
                 {alertCount}
               </span>
             )}

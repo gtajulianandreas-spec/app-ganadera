@@ -87,11 +87,11 @@ export const AnimalList: React.FC<AnimalListProps> = ({
   return (
     <div className="space-y-4">
       {/* Top Banner & Action Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-white p-5 rounded-2xl border border-gray-200 shadow-xs">
-        <div>
-          <h1 className="text-xl font-bold text-gray-900 tracking-tight flex items-center space-x-2">
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 bg-white p-5 rounded-2xl border border-gray-200 shadow-xs">
+        <div className="min-w-0">
+          <h1 className="text-lg sm:text-xl font-bold text-gray-900 tracking-tight flex items-center flex-wrap gap-2">
             <span>Inventario de Ganado</span>
-            <span className="text-sm font-semibold bg-gray-100 text-gray-700 px-2.5 py-0.5 rounded-full">
+            <span className="text-xs sm:text-sm font-semibold bg-gray-100 text-gray-700 px-2.5 py-0.5 rounded-full whitespace-nowrap shrink-0 tabular-nums">
               {filteredAnimals.length} de {animals.length} cabezas
             </span>
           </h1>
@@ -102,113 +102,117 @@ export const AnimalList: React.FC<AnimalListProps> = ({
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="grid grid-cols-2 sm:flex sm:flex-nowrap items-center gap-2 shrink-0">
+          {/* Primary Action */}
+          <button
+            onClick={onOpenCreate}
+            className="col-span-2 sm:col-span-1 sm:order-4 inline-flex items-center justify-center px-3.5 py-2 text-xs font-bold rounded-xl bg-ranch-600 hover:bg-ranch-700 text-white transition-colors shadow-xs whitespace-nowrap"
+          >
+            <Plus className="w-4 h-4 mr-1.5 shrink-0" />
+            Nuevo Animal
+          </button>
+
           {/* Visual Search Button */}
           <button
             onClick={() => onOpenVisualSearch && onOpenVisualSearch()}
-            className="inline-flex items-center px-3.5 py-2 text-xs font-bold rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white shadow-xs transition-all hover:shadow"
+            className="sm:order-1 inline-flex items-center justify-center px-3 py-2 text-xs font-semibold rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 transition-colors whitespace-nowrap"
             title="Buscar ganado cargando o tomando una fotografía"
           >
-            <Camera className="w-3.5 h-3.5 mr-1.5 text-yellow-300 animate-pulse" />
+            <Camera className="w-3.5 h-3.5 mr-1.5 text-emerald-600 shrink-0" />
             Buscar por Foto
           </button>
 
           <button
             onClick={handleExportExcel}
-            className="inline-flex items-center px-3.5 py-2 text-xs font-semibold rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors border border-gray-200 shadow-xs"
+            className="sm:order-2 inline-flex items-center justify-center px-3 py-2 text-xs font-semibold rounded-xl bg-white hover:bg-gray-50 text-gray-700 transition-colors border border-gray-200 shadow-2xs whitespace-nowrap"
           >
-            <Download className="w-3.5 h-3.5 mr-1.5" />
+            <Download className="w-3.5 h-3.5 mr-1.5 shrink-0" />
             Exportar
           </button>
           <button
             onClick={onOpenBulk}
-            className="inline-flex items-center px-3.5 py-2 text-xs font-semibold rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors border border-gray-200 shadow-xs"
+            className="col-span-2 sm:col-span-1 sm:order-3 inline-flex items-center justify-center px-3 py-2 text-xs font-semibold rounded-xl bg-white hover:bg-gray-50 text-gray-700 transition-colors border border-gray-200 shadow-2xs whitespace-nowrap"
           >
-            <Upload className="w-3.5 h-3.5 mr-1.5" />
+            <Upload className="w-3.5 h-3.5 mr-1.5 shrink-0" />
             Carga Masiva
-          </button>
-          <button
-            onClick={onOpenCreate}
-            className="inline-flex items-center px-4 py-2 text-xs font-bold rounded-xl bg-ranch-600 hover:bg-ranch-700 text-white transition-colors shadow-xs"
-          >
-            <Plus className="w-4 h-4 mr-1.5" />
-            Nuevo Animal
           </button>
         </div>
       </div>
 
       {/* Filter and Search Bar */}
       <div className="bg-white p-4 rounded-2xl border border-gray-200 shadow-xs space-y-3">
-        <div className="flex flex-col md:flex-row gap-3">
-          {/* Search Input */}
-          <div className="relative flex-1">
-            <Search className="w-4 h-4 absolute left-3.5 top-3 text-gray-400" />
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={e => setSearchTerm(e.target.value)}
-              placeholder="Buscar por arete (ej. HLP-101), nombre o chip RFID..."
-              className="w-full pl-9 pr-28 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-ranch-500 focus:bg-white transition-all"
-            />
+        {/* Row 1: Search + RFID + View Toggle */}
+        <div className="flex flex-col sm:flex-row gap-2.5 items-stretch sm:items-center">
+          <div className="flex items-center flex-1 gap-2">
+            <div className="relative flex-1 min-w-0">
+              <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={e => setSearchTerm(e.target.value)}
+                placeholder="Buscar por arete (ej. HLP-101), nombre o chip RFID..."
+                className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-ranch-500 focus:bg-white transition-all"
+              />
+            </div>
             {onOpenScanner && (
               <button
                 onClick={onOpenScanner}
-                className="absolute right-1.5 top-1.5 px-2.5 py-1 bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300/80 rounded-lg text-xs font-bold flex items-center space-x-1 shadow-2xs transition-all"
+                className="px-3 py-2 bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300/80 rounded-xl text-xs font-bold flex items-center space-x-1.5 shadow-2xs transition-colors shrink-0 whitespace-nowrap"
                 title="Lector de Chip RFID / NFC y Aretes"
               >
-                <Radio className="w-3.5 h-3.5 text-amber-600 animate-pulse" />
-                <span className="hidden sm:inline">Chip / NFC</span>
-                <span className="sm:hidden">Chip</span>
+                <Radio className="w-3.5 h-3.5 text-amber-600" />
+                <span>Chip / NFC</span>
               </button>
             )}
           </div>
 
           {/* View Mode Toggle */}
-          <div className="flex items-center bg-gray-100 p-1 rounded-xl border border-gray-200 self-start md:self-auto shrink-0">
+          <div className="flex items-center bg-gray-100 p-1 rounded-xl border border-gray-200 self-start sm:self-auto shrink-0">
             <button
               onClick={() => setViewMode('table')}
-              className={`p-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1 transition-all ${
+              className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition-all ${
                 viewMode === 'table' ? 'bg-white shadow-xs text-gray-900' : 'text-gray-500 hover:text-gray-700'
               }`}
               title="Vista de lista detallada"
             >
               <List className="w-4 h-4" />
-              <span className="hidden sm:inline">Tabla</span>
+              <span>Tabla</span>
             </button>
             <button
               onClick={() => setViewMode('grid')}
-              className={`p-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1 transition-all ${
+              className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition-all ${
                 viewMode === 'grid' ? 'bg-white shadow-xs text-gray-900' : 'text-gray-500 hover:text-gray-700'
               }`}
               title="Vista en cuadrícula con fotos"
             >
               <LayoutGrid className="w-4 h-4" />
-              <span className="hidden sm:inline">Fotos</span>
+              <span>Fotos</span>
             </button>
           </div>
+        </div>
 
-          {/* Quick Filter Selects */}
-          <div className="flex flex-wrap items-center gap-2 text-xs">
-            {/* Stage */}
-            <select
-              value={selectedStage}
-              onChange={e => setSelectedStage(e.target.value)}
-              className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-ranch-500"
-            >
-              <option value="all">Todas las Etapas</option>
-              <option value="calf">Ternero / Cría</option>
-              <option value="weaned">Destete</option>
-              <option value="juvenile">Levante / Novillo</option>
-              <option value="adult">Adulto</option>
-            </select>
+        {/* Row 2: Quick Filter Selects */}
+        <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 text-xs">
+          {/* Stage */}
+          <select
+            value={selectedStage}
+            onChange={e => setSelectedStage(e.target.value)}
+            className="w-full sm:w-auto px-2.5 py-2 bg-gray-50 border border-gray-200 rounded-xl font-medium text-gray-700 text-[11px] sm:text-xs truncate focus:outline-none focus:ring-2 focus:ring-ranch-500"
+          >
+            <option value="all">Todas las Etapas</option>
+            <option value="calf">Ternero / Cría</option>
+            <option value="weaned">Destete</option>
+            <option value="juvenile">Levante / Novillo</option>
+            <option value="adult">Adulto</option>
+          </select>
 
-            {/* Purpose */}
-            <select
-              value={selectedPurpose}
-              onChange={e => setSelectedPurpose(e.target.value)}
-              className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-ranch-500"
-            >
-              <option value="all">Todos los Propósitos</option>
+          {/* Purpose */}
+          <select
+            value={selectedPurpose}
+            onChange={e => setSelectedPurpose(e.target.value)}
+            className="w-full sm:w-auto px-2.5 py-2 bg-gray-50 border border-gray-200 rounded-xl font-medium text-gray-700 text-[11px] sm:text-xs truncate focus:outline-none focus:ring-2 focus:ring-ranch-500"
+          >
+            <option value="all">Todos los Propósitos</option>
               <option value="milk">Lechero</option>
               <option value="beef">Carne / Ceba</option>
               <option value="dual_purpose">Doble Propósito</option>
@@ -239,25 +243,93 @@ export const AnimalList: React.FC<AnimalListProps> = ({
               ))}
             </select>
           </div>
-        </div>
       </div>
 
-      {/* Main View: Table Mode */}
+      {/* Main View: Table Mode (Mobile Card List + Desktop Table) */}
       {viewMode === 'table' ? (
         <div className="bg-white rounded-2xl border border-gray-200 shadow-xs overflow-hidden">
-          <div className="overflow-x-auto">
+          {/* Mobile Compact List (< md) */}
+          <div className="md:hidden divide-y divide-gray-100">
+            {filteredAnimals.length === 0 ? (
+              <div className="py-12 px-4 text-center text-gray-400 text-sm font-medium">
+                No se encontraron animales con los filtros seleccionados.
+              </div>
+            ) : (
+              filteredAnimals.map(animal => {
+                const lot = animal.lotId ? lotMap.get(animal.lotId) : undefined;
+                const breedSummary = animal.breedComposition.map(b => b.breedName).join(' × ') || 'Mestizo';
+                return (
+                  <button
+                    key={animal.id}
+                    type="button"
+                    onClick={() => onSelectAnimal(animal)}
+                    className="w-full text-left p-3.5 flex items-center justify-between gap-3 hover:bg-gray-50/80 active:bg-gray-100/70 transition-colors"
+                  >
+                    <div className="flex items-center space-x-3 min-w-0">
+                      <div className="w-11 h-11 rounded-xl overflow-hidden border border-gray-200 shrink-0 bg-gray-100">
+                        {animal.photoUrl ? (
+                          <img src={animal.photoUrl} alt={animal.earTagCode} className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-gray-400">
+                            <Tag className="w-4 h-4" />
+                          </div>
+                        )}
+                      </div>
+                      <div className="min-w-0">
+                        <div className="flex items-center space-x-1.5">
+                          <span className="font-bold text-gray-900 text-sm font-mono whitespace-nowrap">
+                            {animal.earTagCode}
+                          </span>
+                          {animal.name && (
+                            <span className="text-sm font-semibold text-gray-700 truncate">
+                              · {animal.name}
+                            </span>
+                          )}
+                          {animal.electronicId && (
+                            <span className="inline-flex items-center px-1 py-0.2 rounded text-[9px] font-mono bg-blue-50 text-blue-700 border border-blue-200 shrink-0">
+                              RFID
+                            </span>
+                          )}
+                        </div>
+                        <div className="text-xs text-gray-500 truncate mt-0.5">
+                          {breedSummary} · {animal.gender === 'female' ? 'Hembra' : animal.gender === 'male' ? 'Macho' : 'Castrado'}
+                        </div>
+                        <div className="flex items-center flex-wrap gap-1.5 mt-1.5">
+                          {lot && (
+                            <span
+                              className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold whitespace-nowrap"
+                              style={{ backgroundColor: `${lot.color || '#3b82f6'}15`, color: lot.color || '#3b82f6' }}
+                            >
+                              {lot.name}
+                            </span>
+                          )}
+                          <span className="text-[11px] font-bold text-gray-800 tabular-nums">
+                            {animal.currentWeightKg ? `${animal.currentWeightKg} kg` : '—'}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <Eye className="w-4 h-4 text-gray-400 shrink-0" />
+                  </button>
+                );
+              })
+            )}
+          </div>
+
+          {/* Desktop Table (>= md) */}
+          <div className="hidden md:block overflow-x-auto">
             <table className="w-full text-left text-sm">
-              <thead className="bg-gray-50 border-b border-gray-200 text-xs uppercase font-semibold text-gray-500 tracking-wider">
+              <thead className="bg-gray-50 border-b border-gray-200 text-[11px] uppercase font-semibold text-gray-500 tracking-wider">
                 <tr>
-                  <th className="py-3 px-4">Animal & Arete</th>
-                  <th className="py-3 px-4">Nombre / Raza</th>
-                  {currentFarmId === 'all' && <th className="py-3 px-4">Hacienda</th>}
-                  <th className="py-3 px-4">Sexo / Etapa</th>
-                  <th className="py-3 px-4">Lote</th>
-                  <th className="py-3 px-4 text-right">Peso Actual</th>
-                  <th className="py-3 px-4">Propósito</th>
-                  <th className="py-3 px-4">Estado</th>
-                  <th className="py-3 px-4 text-center">Acciones</th>
+                  <th className="py-3 pl-4 pr-2">Animal & Arete</th>
+                  <th className="py-3 px-2.5">Nombre / Raza</th>
+                  {currentFarmId === 'all' && <th className="py-3 px-2.5">Hacienda</th>}
+                  <th className="py-3 px-2.5">Sexo / Etapa</th>
+                  <th className="py-3 px-2.5">Lote</th>
+                  <th className="py-3 px-2.5 text-right whitespace-nowrap">Peso</th>
+                  <th className="py-3 px-2.5">Propósito</th>
+                  <th className="py-3 px-2.5">Estado</th>
+                  <th className="py-3 pl-2 pr-4 text-center">Ficha</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
@@ -280,24 +352,24 @@ export const AnimalList: React.FC<AnimalListProps> = ({
                         onClick={() => onSelectAnimal(animal)}
                       >
                         {/* Photo Thumbnail + Ear Tag */}
-                        <td className="py-3 px-4">
-                          <div className="flex items-center space-x-3">
-                            <div className="w-10 h-10 rounded-xl overflow-hidden border border-gray-200 shrink-0 bg-gray-100 shadow-2xs">
+                        <td className="py-3 pl-4 pr-2">
+                          <div className="flex items-center space-x-2.5">
+                            <div className="w-9 h-9 rounded-xl overflow-hidden border border-gray-200 shrink-0 bg-gray-100 shadow-2xs">
                               {animal.photoUrl ? (
                                 <img src={animal.photoUrl} alt={animal.earTagCode} className="w-full h-full object-cover" />
                               ) : (
-                                <div className="w-full h-full flex items-center justify-center text-sm font-bold text-gray-400">
-                                  🐄
+                                <div className="w-full h-full flex items-center justify-center text-gray-400">
+                                  <Tag className="w-4 h-4" />
                                 </div>
                               )}
                             </div>
-                            <div>
+                            <div className="min-w-0">
                               <div className="flex items-center space-x-1.5">
-                                <span className="font-bold text-gray-900 group-hover:text-ranch-700 transition-colors font-mono">
+                                <span className="font-bold text-gray-900 group-hover:text-ranch-700 transition-colors font-mono whitespace-nowrap">
                                   {animal.earTagCode}
                                 </span>
                                 {animal.electronicId && (
-                                  <span className="inline-flex items-center px-1 py-0.2 rounded text-[9px] font-mono bg-blue-50 text-blue-700 border border-blue-200">
+                                  <span className="inline-flex items-center px-1.5 py-0.2 rounded text-[9px] font-mono bg-blue-50 text-blue-700 border border-blue-200 shrink-0">
                                     RFID
                                   </span>
                                 )}
@@ -310,18 +382,18 @@ export const AnimalList: React.FC<AnimalListProps> = ({
                         </td>
 
                         {/* Name / Breed */}
-                        <td className="py-3 px-4">
+                        <td className="py-3 px-2.5">
                           <div className="font-medium text-gray-800">
                             {animal.name || 'Sin nombre'}
                           </div>
-                          <div className="text-xs text-gray-500 truncate max-w-xs">
+                          <div className="text-xs text-gray-500 truncate max-w-[140px]">
                             {breedSummary}
                           </div>
                         </td>
 
                         {/* Farm (in Global View) */}
                         {currentFarmId === 'all' && (
-                          <td className="py-3 px-4 text-xs font-semibold text-gray-700">
+                          <td className="py-3 px-2.5 text-xs font-semibold text-gray-700 whitespace-nowrap">
                             <div className="flex items-center space-x-1">
                               <Building2 className="w-3.5 h-3.5 text-gray-400" />
                               <span>{farm?.name || 'Finca'}</span>
@@ -330,7 +402,7 @@ export const AnimalList: React.FC<AnimalListProps> = ({
                         )}
 
                         {/* Gender / Stage */}
-                        <td className="py-3 px-4">
+                        <td className="py-3 px-2.5 whitespace-nowrap">
                           <div className="capitalize text-xs font-medium text-gray-700">
                             {animal.gender === 'female' ? 'Hembra' : animal.gender === 'male' ? 'Macho' : 'Castrado'}
                           </div>
@@ -340,10 +412,10 @@ export const AnimalList: React.FC<AnimalListProps> = ({
                         </td>
 
                         {/* Lot */}
-                        <td className="py-3 px-4">
+                        <td className="py-3 px-2.5">
                           {lot ? (
                             <span 
-                              className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium"
+                              className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium whitespace-nowrap"
                               style={{ backgroundColor: `${lot.color || '#3b82f6'}15`, color: lot.color || '#3b82f6' }}
                             >
                               {lot.name}
@@ -354,14 +426,14 @@ export const AnimalList: React.FC<AnimalListProps> = ({
                         </td>
 
                         {/* Weight */}
-                        <td className="py-3 px-4 text-right">
-                          <span className="font-semibold text-gray-800">
+                        <td className="py-3 px-2.5 text-right whitespace-nowrap">
+                          <span className="font-semibold text-gray-800 tabular-nums">
                             {animal.currentWeightKg ? `${animal.currentWeightKg} kg` : '—'}
                           </span>
                         </td>
 
                         {/* Purpose */}
-                        <td className="py-3 px-4">
+                        <td className="py-3 px-2.5 whitespace-nowrap">
                           <span className="inline-flex items-center text-xs font-medium text-gray-600">
                             {animal.purpose === 'milk' ? (
                               <><Milk className="w-3.5 h-3.5 mr-1 text-blue-500" /> Leche</>
@@ -376,14 +448,14 @@ export const AnimalList: React.FC<AnimalListProps> = ({
                         </td>
 
                         {/* Status */}
-                        <td className="py-3 px-4">
+                        <td className="py-3 px-2.5 whitespace-nowrap">
                           <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800">
                             Activo
                           </span>
                         </td>
 
                         {/* Actions */}
-                        <td className="py-3 px-4 text-center">
+                        <td className="py-3 pl-2 pr-4 text-center">
                           <button
                             onClick={(e) => {
                               e.stopPropagation();

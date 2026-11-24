@@ -159,7 +159,7 @@ export const HealthRecordsView: React.FC<HealthRecordsViewProps> = ({
 
         <button
           onClick={() => setShowAddModal(true)}
-          className="inline-flex items-center px-4 py-2 text-xs font-semibold rounded-xl bg-ranch-600 hover:bg-ranch-700 text-white shadow-xs transition-colors"
+          className="inline-flex items-center justify-center px-4 py-2 text-xs font-bold rounded-xl bg-ranch-600 hover:bg-ranch-700 text-white shadow-xs transition-colors whitespace-nowrap shrink-0"
         >
           <Plus className="w-4 h-4 mr-1.5" />
           Registrar Tratamiento
@@ -221,30 +221,34 @@ export const HealthRecordsView: React.FC<HealthRecordsViewProps> = ({
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-xs">
-          <div className="flex items-center justify-between text-gray-500 text-xs font-semibold uppercase">
+        <div className="bg-white p-4 rounded-2xl border border-gray-200 shadow-xs">
+          <div className="flex items-center justify-between text-gray-500 text-xs font-semibold uppercase tracking-wide">
             <span>Tratamientos Totales</span>
-            <Syringe className="w-4 h-4 text-emerald-600" />
+            <Syringe className="w-4 h-4 text-ranch-600" />
           </div>
-          <div className="mt-2 text-2xl font-bold text-gray-900">{healthRecords.length}</div>
+          <div className="mt-2 text-2xl font-bold text-gray-900 tabular-nums">{healthRecords.length}</div>
           <div className="text-xs text-gray-500 mt-1">Registros clínicos en la base local</div>
         </div>
 
-        <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-xs">
-          <div className="flex items-center justify-between text-gray-500 text-xs font-semibold uppercase">
+        <div className="bg-white p-4 rounded-2xl border border-gray-200 shadow-xs">
+          <div className="flex items-center justify-between text-gray-500 text-xs font-semibold uppercase tracking-wide">
             <span>Animales en Retiro Leche</span>
-            <ShieldAlert className="w-4 h-4 text-rose-600" />
+            <ShieldAlert className={`w-4 h-4 ${activeMilkWithdrawals.length > 0 ? 'text-rose-600' : 'text-emerald-600'}`} />
           </div>
-          <div className="mt-2 text-2xl font-bold text-rose-600">{activeMilkWithdrawals.length}</div>
+          <div className={`mt-2 text-2xl font-bold tabular-nums ${activeMilkWithdrawals.length > 0 ? 'text-rose-600' : 'text-gray-900'}`}>
+            {activeMilkWithdrawals.length}
+          </div>
           <div className="text-xs text-gray-500 mt-1">Control estricto antibióticos</div>
         </div>
 
-        <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-xs">
-          <div className="flex items-center justify-between text-gray-500 text-xs font-semibold uppercase">
+        <div className="bg-white p-4 rounded-2xl border border-gray-200 shadow-xs">
+          <div className="flex items-center justify-between text-gray-500 text-xs font-semibold uppercase tracking-wide">
             <span>Animales en Retiro Carne</span>
-            <AlertTriangle className="w-4 h-4 text-amber-600" />
+            <AlertTriangle className={`w-4 h-4 ${activeMeatWithdrawals.length > 0 ? 'text-amber-600' : 'text-emerald-600'}`} />
           </div>
-          <div className="mt-2 text-2xl font-bold text-amber-600">{activeMeatWithdrawals.length}</div>
+          <div className={`mt-2 text-2xl font-bold tabular-nums ${activeMeatWithdrawals.length > 0 ? 'text-amber-600' : 'text-gray-900'}`}>
+            {activeMeatWithdrawals.length}
+          </div>
           <div className="text-xs text-gray-500 mt-1">Tiempo de espera para beneficio</div>
         </div>
       </div>
@@ -275,24 +279,22 @@ export const HealthRecordsView: React.FC<HealthRecordsViewProps> = ({
       {/* Health Table */}
       <div className="bg-white rounded-2xl border border-gray-200 shadow-xs overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200 text-left text-xs">
-            <thead className="bg-gray-50 text-gray-600 font-semibold uppercase tracking-wider">
+          <table className="w-full divide-y divide-gray-200 text-left text-xs">
+            <thead className="bg-gray-50 text-gray-500 font-semibold uppercase tracking-wider text-[11px]">
               <tr>
-                <th className="px-4 py-3">Fecha</th>
-                <th className="px-4 py-3">Animal</th>
-                <th className="px-4 py-3">Tipo</th>
-                <th className="px-4 py-3">Medicamento / Producto</th>
-                <th className="px-4 py-3">Dosis & Vía</th>
-                <th className="px-4 py-3">Lote / Reg</th>
-                <th className="px-4 py-3">Retiro Leche</th>
-                <th className="px-4 py-3">Retiro Carne</th>
-                <th className="px-4 py-3">Veterinario</th>
+                <th className="pl-4 pr-2 py-3">Fecha</th>
+                <th className="px-2 py-3">Animal</th>
+                <th className="px-2 py-3">Tipo</th>
+                <th className="px-2 py-3">Medicamento / Lote</th>
+                <th className="px-2 py-3">Dosis & Vía</th>
+                <th className="px-2 py-3">Períodos de Retiro</th>
+                <th className="pl-2 pr-4 py-3">Veterinario</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
               {filteredRecords.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="px-4 py-8 text-center text-gray-400">
+                  <td colSpan={7} className="px-4 py-8 text-center text-gray-400">
                     No hay registros de sanidad cargados con este filtro.
                   </td>
                 </tr>
@@ -301,30 +303,48 @@ export const HealthRecordsView: React.FC<HealthRecordsViewProps> = ({
                   const animal = animalMap.get(r.animalId);
                   const isMilkRestricted = r.safeMilkDate && r.safeMilkDate >= todayStr;
                   const isMeatRestricted = r.safeMeatDate && r.safeMeatDate >= todayStr;
+                  const typeLabel: Record<string, string> = {
+                    vaccine: 'Vacuna',
+                    treatment: 'Tratamiento',
+                    antiparasitic: 'Desparasitante',
+                    mastitis: 'Mastitis',
+                    castration: 'Castración',
+                    checkup: 'Chequeo'
+                  };
+                  const routeLabel: Record<string, string> = {
+                    subcutaneous: 'Subcutánea',
+                    intramuscular: 'Intramuscular',
+                    intravenous: 'Intravenosa',
+                    topical: 'Tópica',
+                    intramammary: 'Intramamaria',
+                    oral: 'Oral',
+                    'pour-on': 'Pour-on'
+                  };
 
                   return (
                     <tr key={r.id} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-4 py-3 font-semibold text-gray-900 whitespace-nowrap">{r.date}</td>
-                      <td className="px-4 py-3">
-                        <span className="font-bold text-gray-900">{animal?.earTagCode || r.animalId}</span>
-                        {animal?.name && <span className="text-gray-500 ml-1">({animal.name})</span>}
+                      <td className="pl-4 pr-2 py-3 font-medium text-gray-700 whitespace-nowrap tabular-nums">{r.date}</td>
+                      <td className="px-2 py-3 whitespace-nowrap">
+                        <div className="font-bold text-gray-900 font-mono">{animal?.earTagCode || r.animalId}</div>
+                        {animal?.name && <div className="text-[11px] text-gray-500">{animal.name}</div>}
                       </td>
-                      <td className="px-4 py-3">
-                        <span className="px-2 py-0.5 rounded text-xs font-semibold bg-blue-50 text-blue-800 border border-blue-200 capitalize">
-                          {r.type}
+                      <td className="px-2 py-3 whitespace-nowrap">
+                        <span className="px-2 py-0.5 rounded-md text-[11px] font-semibold bg-gray-100 text-gray-700 border border-gray-200">
+                          {typeLabel[r.type] || r.type}
                         </span>
                       </td>
-                      <td className="px-4 py-3 font-semibold text-gray-900">
-                        {r.treatmentName}
+                      <td className="px-2 py-3 font-semibold text-gray-900">
+                        <div>{r.treatmentName}</div>
+                        {r.batchNumber && <div className="text-[11px] font-mono font-normal text-gray-500">Lote: {r.batchNumber}</div>}
                         {r.diagnosis && <p className="text-[11px] text-gray-500 font-normal">Diag: {r.diagnosis}</p>}
                       </td>
-                      <td className="px-4 py-3 text-gray-700">
-                        <span className="font-semibold text-gray-900">
+                      <td className="px-2 py-3 text-gray-700 whitespace-nowrap">
+                        <span className="font-semibold text-gray-900 tabular-nums">
                           {r.doseAmount || r.doseMl || 'N/A'} {r.doseUnit || (r.doseMl ? 'mL' : '')}
                         </span>
                         {r.administrationRoute && (
-                          <span className="block text-[11px] text-gray-500 capitalize">
-                            Vía: {r.administrationRoute}
+                          <span className="block text-[11px] text-gray-500">
+                            Vía: {routeLabel[r.administrationRoute] || r.administrationRoute}
                           </span>
                         )}
                         {r.gpsCoordinates && (
@@ -340,38 +360,37 @@ export const HealthRecordsView: React.FC<HealthRecordsViewProps> = ({
                           </a>
                         )}
                       </td>
-                      <td className="px-4 py-3 font-mono text-gray-500">{r.batchNumber || '-'}</td>
-                      <td className="px-4 py-3">
-                        {r.withdrawalDaysMilk > 0 ? (
-                          isMilkRestricted ? (
-                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-rose-100 text-rose-800 border border-rose-300">
-                              Bloqueada hasta {r.safeMilkDate}
-                            </span>
-                          ) : (
-                            <span className="text-emerald-700 font-semibold flex items-center">
-                              <CheckCircle2 className="w-3.5 h-3.5 mr-1" />
-                              Cumplido ({r.withdrawalDaysMilk}d)
-                            </span>
-                          )
-                        ) : (
-                          <span className="text-gray-400">0 días</span>
-                        )}
-                      </td>
-                      <td className="px-4 py-3">
-                        {r.withdrawalDaysMeat > 0 ? (
-                          isMeatRestricted ? (
-                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300">
-                              En espera hasta {r.safeMeatDate}
-                            </span>
-                          ) : (
-                            <span className="text-emerald-700 font-semibold flex items-center">
-                              <CheckCircle2 className="w-3.5 h-3.5 mr-1" />
-                              Apto ({r.withdrawalDaysMeat}d)
-                            </span>
-                          )
-                        ) : (
-                          <span className="text-gray-400">0 días</span>
-                        )}
+                      <td className="px-2 py-3 whitespace-nowrap">
+                        <div className="space-y-1">
+                          <div>
+                            <span className="text-gray-400 mr-1">Leche:</span>
+                            {r.withdrawalDaysMilk > 0 ? (
+                              isMilkRestricted ? (
+                                <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-bold bg-rose-100 text-rose-800">
+                                  Hasta {r.safeMilkDate}
+                                </span>
+                              ) : (
+                                <span className="text-emerald-700 font-semibold">Cumplido ({r.withdrawalDaysMilk}d)</span>
+                              )
+                            ) : (
+                              <span className="text-gray-600 font-medium">Sin retiro</span>
+                            )}
+                          </div>
+                          <div>
+                            <span className="text-gray-400 mr-1">Carne:</span>
+                            {r.withdrawalDaysMeat > 0 ? (
+                              isMeatRestricted ? (
+                                <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-bold bg-amber-100 text-amber-800">
+                                  Hasta {r.safeMeatDate}
+                                </span>
+                              ) : (
+                                <span className="text-emerald-700 font-semibold">Apto ({r.withdrawalDaysMeat}d)</span>
+                              )
+                            ) : (
+                              <span className="text-gray-600 font-medium">Sin retiro</span>
+                            )}
+                          </div>
+                        </div>
                       </td>
                       <td className="px-4 py-3 text-gray-600">{r.veterinarianName || '-'}</td>
                     </tr>
