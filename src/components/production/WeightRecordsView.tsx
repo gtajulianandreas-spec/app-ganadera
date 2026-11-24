@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Scale, Plus, Bluetooth, Check, TrendingUp } from 'lucide-react';
 import type { WeightRecord } from '../../types/production';
 import type { Animal } from '../../types/animal';
 import { db } from '../../db';
 import { syncEngine } from '../../sync/engine';
+import { generateId } from '../../utils/id';
 
 interface WeightRecordsViewProps {
   weights: WeightRecord[];
@@ -22,7 +23,7 @@ export const WeightRecordsView: React.FC<WeightRecordsViewProps> = ({
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [isBluetoothReading, setIsBluetoothReading] = useState(false);
 
-  const animalMap = new Map(animals.map(a => [a.id, a]));
+  const animalMap = useMemo(() => new Map(animals.map(a => [a.id, a])), [animals]);
 
   const handleSimulateBluetoothScale = () => {
     setIsBluetoothReading(true);
@@ -55,8 +56,11 @@ export const WeightRecordsView: React.FC<WeightRecordsViewProps> = ({
       averageDailyGainKg = Number((gain / days).toFixed(2));
     }
 
+    const selectedAnimal = animalMap.get(selectedAnimalId);
+
     const newWeight: WeightRecord = {
-      id: 'w_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
+      id: generateId('wt'),
+      farmId: selectedAnimal?.farmId,
       animalId: selectedAnimalId,
       date,
       weightKg: Number(weightKg),

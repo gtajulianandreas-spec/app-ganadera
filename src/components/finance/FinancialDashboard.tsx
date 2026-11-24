@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { 
   DollarSign, 
   TrendingUp, 
@@ -25,6 +25,7 @@ import type { MilkingRecord, WeightRecord } from '../../types/production';
 import { FinancialEngine } from '../../services/financialEngine';
 import { db } from '../../db';
 import { syncEngine } from '../../sync/engine';
+import { generateId } from '../../utils/id';
 
 interface FinancialDashboardProps {
   financials: FinancialRecord[];
@@ -46,20 +47,22 @@ export const FinancialDashboard: React.FC<FinancialDashboardProps> = ({
   const [amount, setAmount] = useState<string>('500');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
 
-  const economics = FinancialEngine.calculateUnitEconomics(financials, milkings, weights);
+  const economics = useMemo(() => {
+    return FinancialEngine.calculateUnitEconomics(financials, milkings, weights);
+  }, [financials, milkings, weights]);
 
-  const chartData = [
+  const chartData = useMemo(() => [
     { name: 'Lechería', Ingresos: economics.totalMilkRevenue, Costos: economics.totalCostMilkProduction },
     { name: 'Carne / Ceba', Ingresos: economics.totalBeefRevenue, Costos: economics.totalCostBeefProduction },
     { name: 'Total Operativo', Ingresos: economics.totalIncome, Costos: economics.totalExpense }
-  ];
+  ], [economics]);
 
   const handleSaveTransaction = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!description.trim() || !amount) return;
 
     const newRecord: FinancialRecord = {
-      id: 'fin_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
+      id: generateId('fin'),
       farmId: 'default_farm',
       date,
       type: txType,

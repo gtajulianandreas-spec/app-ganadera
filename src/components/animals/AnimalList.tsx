@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { 
   Plus, 
   Search, 
@@ -19,7 +19,6 @@ import {
 } from 'lucide-react';
 import type { Animal, Lot, Farm } from '../../types/animal';
 import { ExcelService } from '../../services/excelService';
-import { VisualSearchModal } from './VisualSearchModal';
 
 interface AnimalListProps {
   animals: Animal[];
@@ -30,6 +29,7 @@ interface AnimalListProps {
   onOpenCreate: () => void;
   onOpenBulk: () => void;
   onOpenScanner?: () => void;
+  onOpenVisualSearch?: () => void;
 }
 
 export const AnimalList: React.FC<AnimalListProps> = ({
@@ -40,7 +40,8 @@ export const AnimalList: React.FC<AnimalListProps> = ({
   onSelectAnimal,
   onOpenCreate,
   onOpenBulk,
-  onOpenScanner
+  onOpenScanner,
+  onOpenVisualSearch
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedGender, setSelectedGender] = useState<string>('all');
@@ -48,25 +49,28 @@ export const AnimalList: React.FC<AnimalListProps> = ({
   const [selectedStage, setSelectedStage] = useState<string>('all');
   const [selectedLotId, setSelectedLotId] = useState<string>('all');
   const [viewMode, setViewMode] = useState<'table' | 'grid'>('table');
-  const [isVisualSearchOpen, setIsVisualSearchOpen] = useState(false);
 
-  const lotMap = new Map(lots.map(l => [l.id, l]));
-  const farmMap = new Map(farms.map(f => [f.id, f]));
+  const lotMap = useMemo(() => new Map(lots.map(l => [l.id, l])), [lots]);
+  const farmMap = useMemo(() => new Map(farms.map(f => [f.id, f])), [farms]);
 
   // Filter animals
-  const filteredAnimals = animals.filter(a => {
-    const matchesSearch = 
-      a.earTagCode.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (a.name && a.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (a.electronicId && a.electronicId.toLowerCase().includes(searchTerm.toLowerCase()));
+  const filteredAnimals = useMemo(() => {
+    const searchLower = searchTerm.trim().toLowerCase();
+    return animals.filter(a => {
+      const matchesSearch = 
+        !searchLower ||
+        a.earTagCode.toLowerCase().includes(searchLower) ||
+        (a.name && a.name.toLowerCase().includes(searchLower)) ||
+        (a.electronicId && a.electronicId.toLowerCase().includes(searchLower));
 
-    const matchesGender = selectedGender === 'all' || a.gender === selectedGender;
-    const matchesPurpose = selectedPurpose === 'all' || a.purpose === selectedPurpose;
-    const matchesStage = selectedStage === 'all' || a.currentStage === selectedStage;
-    const matchesLot = selectedLotId === 'all' || a.lotId === selectedLotId;
+      const matchesGender = selectedGender === 'all' || a.gender === selectedGender;
+      const matchesPurpose = selectedPurpose === 'all' || a.purpose === selectedPurpose;
+      const matchesStage = selectedStage === 'all' || a.currentStage === selectedStage;
+      const matchesLot = selectedLotId === 'all' || a.lotId === selectedLotId;
 
-    return matchesSearch && matchesGender && matchesPurpose && matchesStage && matchesLot;
-  });
+      return matchesSearch && matchesGender && matchesPurpose && matchesStage && matchesLot;
+    });
+  }, [animals, searchTerm, selectedGender, selectedPurpose, selectedStage, selectedLotId]);
 
   const handleExportExcel = async () => {
     const blob = await ExcelService.exportAnimalsToExcel(filteredAnimals);
@@ -101,7 +105,7 @@ export const AnimalList: React.FC<AnimalListProps> = ({
         <div className="flex flex-wrap items-center gap-2">
           {/* Visual Search Button */}
           <button
-            onClick={() => setIsVisualSearchOpen(true)}
+            onClick={() => onOpenVisualSearch && onOpenVisualSearch()}
             className="inline-flex items-center px-3.5 py-2 text-xs font-bold rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white shadow-xs transition-all hover:shadow"
             title="Buscar ganado cargando o tomando una fotografía"
           >
@@ -487,18 +491,6 @@ export const AnimalList: React.FC<AnimalListProps> = ({
             })
           )}
         </div>
-      )}
-
-      {/* Visual Search Modal */}
-      {isVisualSearchOpen && (
-        <VisualSearchModal
-          animals={filteredAnimals}
-          onClose={() => setIsVisualSearchOpen(false)}
-          onSelectAnimal={animal => {
-            setIsVisualSearchOpen(false);
-            onSelectAnimal(animal);
-          }}
-        />
       )}
     </div>
   );

@@ -65,6 +65,39 @@ export class AppGanaderaDatabase extends Dexie {
       backups: 'id, timestamp',
       settings: 'id'
     });
+
+    // Version 3 (Indexed farmId on relational records for O(1) multi-farm queries)
+    this.version(3).stores({
+      farms: 'id, name, purpose, updatedAt',
+      animals: 'id, earTagCode, electronicId, species, gender, currentStage, purpose, farmId, lotId, pastureId, status, updatedAt',
+      lots: 'id, farmId, name, purpose, pastureId, updatedAt',
+      pastures: 'id, farmId, name, status, updatedAt',
+      reproductionEvents: 'id, farmId, animalId, eventType, date, sireId, pregnancyResult, projectedCalvingDate, mandatoryDryOffDate, updatedAt',
+      milkingRecords: 'id, farmId, animalId, date, shift, liters',
+      weightRecords: 'id, farmId, animalId, date, weightKg, averageDailyGainKg',
+      healthRecords: 'id, farmId, animalId, date, type, safeMilkDate, safeMeatDate',
+      financialRecords: 'id, farmId, date, type, category',
+      syncOutbox: 'id, entityType, actionType, entityId, status, timestamp',
+      backups: 'id, timestamp',
+      settings: 'id'
+    }).upgrade(async tx => {
+      const animals = await tx.table('animals').toArray();
+      const animalFarmMap = new Map(animals.map(a => [a.id, a.farmId]));
+      const defaultFarmId = animals[0]?.farmId || 'farm-1';
+
+      const backfillTable = async (tableName: string) => {
+        await tx.table(tableName).toCollection().modify((record: { farmId?: string; animalId?: string }) => {
+          if (!record.farmId) {
+            record.farmId = (record.animalId ? animalFarmMap.get(record.animalId) : undefined) || defaultFarmId;
+          }
+        });
+      };
+
+      await backfillTable('reproductionEvents');
+      await backfillTable('milkingRecords');
+      await backfillTable('weightRecords');
+      await backfillTable('healthRecords');
+    });
   }
 }
 

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { X, Building2, MapPin, User, Ruler, DollarSign, Check } from 'lucide-react';
 import type { Farm } from '../../types/animal';
 import { db } from '../../db';
+import { generateId } from '../../utils/id';
 
 interface CreateFarmModalProps {
   onClose: () => void;
@@ -30,7 +31,7 @@ export const CreateFarmModal: React.FC<CreateFarmModalProps> = ({
     }
 
     const farm: Farm = {
-      id: 'farm-' + Date.now(),
+      id: generateId('farm'),
       name: name.trim(),
       ownerName: ownerName.trim() || 'Propietario',
       location: location.trim() || undefined,

@@ -1,5 +1,6 @@
 export interface MilkingRecord {
   id: string;
+  farmId?: string;
   animalId: string;
   date: string; // YYYY-MM-DD
   shift: 'AM' | 'PM' | 'NOON';
@@ -15,6 +16,7 @@ export interface MilkingRecord {
 
 export interface WeightRecord {
   id: string;
+  farmId?: string;
   animalId: string;
   date: string; // YYYY-MM-DD
   weightKg: number;
@@ -29,6 +31,7 @@ export type DoseUnit = 'ml' | 'cc' | 'mg' | 'g' | 'dosis' | 'tableta' | 'frasco'
 
 export interface HealthRecord {
   id: string;
+  farmId?: string;
   animalId: string;
   date: string;
   type: 'vaccine' | 'treatment' | 'antiparasitic' | 'mastitis' | 'castration' | 'checkup';

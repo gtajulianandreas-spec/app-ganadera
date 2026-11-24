@@ -24,6 +24,7 @@ import {
 import type { AppTab } from './Sidebar';
 import type { UserRole } from '../../types/userRole';
 import { USER_ROLES } from '../../types/userRole';
+import { useFarmContext } from '../../context/FarmContext';
 
 interface MobileTabBarProps {
   currentTab: AppTab;
@@ -66,6 +67,16 @@ export const MobileTabBar: React.FC<MobileTabBarProps> = ({
 }) => {
   const [isActionSheetOpen, setIsActionSheetOpen] = useState(false);
   const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
+
+  let farmContext: ReturnType<typeof useFarmContext> | null = null;
+  try {
+    farmContext = useFarmContext();
+  } catch {
+    // optional fallback
+  }
+
+  const effectiveRole = currentRole || farmContext?.currentRole || 'admin';
+  const effectiveOnChangeRole = onChangeRole || farmContext?.setCurrentRole;
 
   return (
     <>
@@ -269,21 +280,21 @@ export const MobileTabBar: React.FC<MobileTabBarProps> = ({
             </div>
 
             {/* User Role Selector on Mobile */}
-            {onChangeRole && currentRole && (
+            {effectiveOnChangeRole && effectiveRole && (
               <div className="bg-gray-50 border border-gray-200 p-2.5 rounded-2xl">
                 <div className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2 flex items-center justify-between">
                   <span>Perfil de Usuario</span>
                   <span className="text-ranch-700 font-extrabold bg-ranch-100 px-2 py-0.5 rounded-md text-[10px]">
-                    {USER_ROLES[currentRole].shortLabel}
+                    {USER_ROLES[effectiveRole].shortLabel}
                   </span>
                 </div>
                 <div className="grid grid-cols-3 gap-1.5">
                   {(Object.keys(USER_ROLES) as UserRole[]).map(roleKey => {
-                    const isSelected = currentRole === roleKey;
+                    const isSelected = effectiveRole === roleKey;
                     return (
                       <button
                         key={roleKey}
-                        onClick={() => onChangeRole(roleKey)}
+                        onClick={() => effectiveOnChangeRole(roleKey)}
                         className={`py-1.5 px-1.5 rounded-xl text-[11px] font-bold transition-all text-center truncate ${
                           isSelected
                             ? 'bg-ranch-600 text-white shadow-xs'

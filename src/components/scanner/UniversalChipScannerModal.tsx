@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { X, Radio, Camera, Cpu, Search, CheckCircle, AlertCircle, RefreshCw } from 'lucide-react';
 import type { Animal } from '../../types/animal';
+import { playBeep } from '../../utils/sound';
 
 interface UniversalChipScannerModalProps {
   isOpen: boolean;
@@ -33,27 +34,7 @@ export const UniversalChipScannerModal: React.FC<UniversalChipScannerModalProps>
   const [matchedAnimal, setMatchedAnimal] = useState<Animal | null>(null);
   const [manualCode, setManualCode] = useState<string>('');
 
-  // Audio beep feedback for field confirmation
-  const playBeep = () => {
-    try {
-      const audioCtx = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(880, audioCtx.currentTime); // 880Hz A5 note
-      gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      osc.start();
-      osc.stop(audioCtx.currentTime + 0.15);
-      if (navigator.vibrate) {
-        navigator.vibrate([100, 50, 100]);
-      }
-    } catch {
-      // AudioContext not allowed or muted
-    }
-  };
+
 
   // Check NFC capability
   useEffect(() => {

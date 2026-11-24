@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Milk, Plus, Calendar, TrendingUp } from 'lucide-react';
 import { 
   ResponsiveContainer, 
@@ -13,6 +13,7 @@ import type { MilkingRecord } from '../../types/production';
 import type { Animal } from '../../types/animal';
 import { db } from '../../db';
 import { syncEngine } from '../../sync/engine';
+import { generateId } from '../../utils/id';
 
 interface MilkRecordsViewProps {
   milkings: MilkingRecord[];
@@ -33,26 +34,32 @@ export const MilkRecordsView: React.FC<MilkRecordsViewProps> = ({
   const [fat, setFat] = useState<string>('3.8');
   const [calfLiters, setCalfLiters] = useState<string>('2.0');
 
-  const animalMap = new Map(animals.map(a => [a.id, a]));
+  const animalMap = useMemo(() => new Map(animals.map(a => [a.id, a])), [animals]);
 
   // Aggregate milk by date for charts
-  const dateMap = new Map<string, number>();
-  for (const m of milkings) {
-    dateMap.set(m.date, (dateMap.get(m.date) || 0) + m.liters);
-  }
-  const chartData = Array.from(dateMap.entries())
-    .map(([d, l]) => ({ fecha: d.slice(5), litros: Number(l.toFixed(1)) }))
-    .slice(-14);
-
-  const totalLiters = milkings.reduce((sum, m) => sum + m.liters, 0);
-  const avgPerShift = milkings.length > 0 ? (totalLiters / milkings.length).toFixed(1) : '0';
+  const { chartData, totalLiters, avgPerShift } = useMemo(() => {
+    const dateMap = new Map<string, number>();
+    let sumLiters = 0;
+    for (const m of milkings) {
+      dateMap.set(m.date, (dateMap.get(m.date) || 0) + m.liters);
+      sumLiters += m.liters;
+    }
+    const data = Array.from(dateMap.entries())
+      .map(([d, l]) => ({ fecha: d.slice(5), litros: Number(l.toFixed(1)) }))
+      .slice(-14);
+    const avg = milkings.length > 0 ? (sumLiters / milkings.length).toFixed(1) : '0';
+    return { chartData: data, totalLiters: sumLiters, avgPerShift: avg };
+  }, [milkings]);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!liters) return;
 
+    const selectedAnimal = animalMap.get(selectedAnimalId);
+
     const newMilking: MilkingRecord = {
-      id: 'milk_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
+      id: generateId('milk'),
+      farmId: selectedAnimal?.farmId,
       animalId: selectedAnimalId,
       date,
       shift,

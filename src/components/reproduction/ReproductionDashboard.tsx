@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { 
   GitBranch, 
   Calendar, 
@@ -20,6 +20,7 @@ import type { Animal } from '../../types/animal';
 import { ReproductionEngine } from '../../services/reproductionEngine';
 import { db } from '../../db';
 import { syncEngine } from '../../sync/engine';
+import { generateId } from '../../utils/id';
 
 interface ReproductionDashboardProps {
   animals: Animal[];
@@ -50,35 +51,46 @@ export const ReproductionDashboard: React.FC<ReproductionDashboardProps> = ({
   const [dryOffProduct, setDryOffProduct] = useState('Cefalonio Intramamario (Cefa-Dry) + Sellador Bismuto');
   const [dryOffNotes, setDryOffNotes] = useState('Secado brusco con aplicación de tubo en los 4 cuartos');
 
-  const animalMap = new Map(animals.map(a => [a.id, a]));
+  const animalMap = useMemo(() => new Map(animals.map(a => [a.id, a])), [animals]);
+  const todayStr = useMemo(() => new Date().toISOString().split('T')[0], []);
+  const next45DaysStr = useMemo(() => {
+    const d = new Date();
+    d.setDate(d.getDate() + 45);
+    return d.toISOString().split('T')[0];
+  }, []);
 
   // 1. Pregnant cows list
-  const pregnantEvents = reproEvents.filter(r => r.pregnancyResult === 'pregnant' && r.projectedCalvingDate);
+  const pregnantEvents = useMemo(() => {
+    return reproEvents.filter(r => r.pregnancyResult === 'pregnant' && r.projectedCalvingDate);
+  }, [reproEvents]);
 
   // 2. Upcoming calvings in next 45 days
-  const todayStr = new Date().toISOString().split('T')[0];
-  const next45Days = new Date();
-  next45Days.setDate(next45Days.getDate() + 45);
-  const next45DaysStr = next45Days.toISOString().split('T')[0];
-
-  const upcomingCalvings = pregnantEvents.filter(r => 
-    r.projectedCalvingDate && r.projectedCalvingDate >= todayStr && r.projectedCalvingDate <= next45DaysStr
-  ).sort((a, b) => (a.projectedCalvingDate || '').localeCompare(b.projectedCalvingDate || ''));
+  const upcomingCalvings = useMemo(() => {
+    return pregnantEvents.filter(r => 
+      r.projectedCalvingDate && r.projectedCalvingDate >= todayStr && r.projectedCalvingDate <= next45DaysStr
+    ).sort((a, b) => (a.projectedCalvingDate || '').localeCompare(b.projectedCalvingDate || ''));
+  }, [pregnantEvents, todayStr, next45DaysStr]);
 
   // 3. Dry-Off Alerts (due within 30 days or already due)
-  const dryOffAlerts = pregnantEvents.filter(r => 
-    r.mandatoryDryOffDate && r.mandatoryDryOffDate <= next45DaysStr
-  );
+  const dryOffAlerts = useMemo(() => {
+    return pregnantEvents.filter(r => 
+      r.mandatoryDryOffDate && r.mandatoryDryOffDate <= next45DaysStr
+    );
+  }, [pregnantEvents, next45DaysStr]);
 
   // 4. Dedicated Dry-Off events recorded
-  const dryOffEvents = reproEvents.filter(r => r.eventType === 'dry_off');
+  const dryOffEvents = useMemo(() => {
+    return reproEvents.filter(r => r.eventType === 'dry_off');
+  }, [reproEvents]);
 
   // 5. Recurrent Heat Monitor (inseminated 18 to 24 days ago)
-  const recentInseminations = reproEvents.filter(r => r.eventType === 'insemination');
-  const heatWatchList = recentInseminations.map(r => {
-    const { inWindow, daysAgo } = ReproductionEngine.isHeatAlertWindow(r.date);
-    return { event: r, inWindow, daysAgo, animal: animalMap.get(r.animalId) };
-  }).filter(item => item.inWindow);
+  const heatWatchList = useMemo(() => {
+    const recentInseminations = reproEvents.filter(r => r.eventType === 'insemination');
+    return recentInseminations.map(r => {
+      const { inWindow, daysAgo } = ReproductionEngine.isHeatAlertWindow(r.date);
+      return { event: r, inWindow, daysAgo, animal: animalMap.get(r.animalId) };
+    }).filter(item => item.inWindow);
+  }, [reproEvents, animalMap]);
 
   const handleSaveEvent = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -98,7 +110,8 @@ export const ReproductionDashboard: React.FC<ReproductionDashboardProps> = ({
     }
 
     const newEvent: ReproductionEvent = {
-      id: 'rep_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
+      id: generateId('rep'),
+      farmId: animal?.farmId,
       animalId: selectedAnimalId,
       eventType,
       date: eventDate,
@@ -120,8 +133,11 @@ export const ReproductionDashboard: React.FC<ReproductionDashboardProps> = ({
 
   const handleSaveDryOff = async (e: React.FormEvent) => {
     e.preventDefault();
+    const dryAnimal = animalMap.get(dryOffCowId);
+
     const newEvent: ReproductionEvent = {
-      id: 'dry_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
+      id: generateId('dry'),
+      farmId: dryAnimal?.farmId,
       animalId: dryOffCowId,
       eventType: 'dry_off',
       date: dryOffDate,

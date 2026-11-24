@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { 
   HeartPulse, 
   Plus, 
@@ -18,6 +18,7 @@ import type { Animal } from '../../types/animal';
 import { db } from '../../db';
 import { syncEngine } from '../../sync/engine';
 import { GpsService, type GpsCoordinateResult } from '../../services/gpsService';
+import { generateId } from '../../utils/id';
 
 interface HealthRecordsViewProps {
   healthRecords: HealthRecord[];
@@ -53,19 +54,17 @@ export const HealthRecordsView: React.FC<HealthRecordsViewProps> = ({
   const [gpsLocation, setGpsLocation] = useState<GpsCoordinateResult | null>(null);
   const [gpsError, setGpsError] = useState<string | null>(null);
 
-  const animalMap = new Map(animals.map(a => [a.id, a]));
-  const todayStr = new Date().toISOString().split('T')[0];
+  const animalMap = useMemo(() => new Map(animals.map(a => [a.id, a])), [animals]);
+  const todayStr = useMemo(() => new Date().toISOString().split('T')[0], []);
 
   // Calculate active withdrawal restrictions
-  const activeMilkWithdrawals = healthRecords.filter(r => {
-    if (!r.safeMilkDate) return false;
-    return r.safeMilkDate >= todayStr;
-  });
+  const activeMilkWithdrawals = useMemo(() => {
+    return healthRecords.filter(r => r.safeMilkDate && r.safeMilkDate >= todayStr);
+  }, [healthRecords, todayStr]);
 
-  const activeMeatWithdrawals = healthRecords.filter(r => {
-    if (!r.safeMeatDate) return false;
-    return r.safeMeatDate >= todayStr;
-  });
+  const activeMeatWithdrawals = useMemo(() => {
+    return healthRecords.filter(r => r.safeMeatDate && r.safeMeatDate >= todayStr);
+  }, [healthRecords, todayStr]);
 
   const handleCaptureGps = async () => {
     setGpsLoading(true);
@@ -104,8 +103,11 @@ export const HealthRecordsView: React.FC<HealthRecordsViewProps> = ({
 
     const parsedDose = doseAmount ? parseFloat(doseAmount) : undefined;
 
+    const selectedAnimal = animalMap.get(selectedAnimalId);
+
     const record: HealthRecord = {
-      id: 'hlt_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+      id: generateId('hlt'),
+      farmId: selectedAnimal?.farmId,
       animalId: selectedAnimalId,
       date,
       type,
@@ -135,10 +137,12 @@ export const HealthRecordsView: React.FC<HealthRecordsViewProps> = ({
     onRefresh();
   };
 
-  const filteredRecords = healthRecords.filter(r => {
-    if (filterType === 'all') return true;
-    return r.type === filterType;
-  });
+  const filteredRecords = useMemo(() => {
+    return healthRecords.filter(r => {
+      if (filterType === 'all') return true;
+      return r.type === filterType;
+    });
+  }, [healthRecords, filterType]);
 
   return (
     <div className="space-y-6">

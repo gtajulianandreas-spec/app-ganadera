@@ -98,6 +98,47 @@ APP GANADERA/
 
 ---
 
+## 🏛️ Subdirectories & System Boundaries
+
+- [`src/`](./src/README.md): Core application source code encompassing domain TypeScript models, IndexedDB client storage, synchronization engine, livestock domain services, and modular UI components.
+- [`public/`](./public): Static web and PWA assets, including Web App Manifest, offline service worker, vector favicons, and touch icons.
+
+---
+
+## 🛡️ Global Invariants
+
+- **Offline-First Persistence:** All operational and business transactions (animal registrations, weighings, milkings, health treatments, reproductive events) must commit locally to IndexedDB before any network synchronization is attempted.
+- **Entity Identity & Monotonicity:** Every livestock record is identified by an immutable UUIDv7 string timestamped at creation. Ear tags (`earTag`) must remain unique within a given farm tenant.
+- **Biosecurity & Food Safety Locks:** Animals under active veterinary drug withdrawal periods (`meatWithdrawalDate` or `milkWithdrawalDate` in the future) are flagged across all UI views and produce visual alerts preventing uninspected marketing or milking.
+- **Deterministic Synchronization Order:** The outbox queue processes mutations in strict insertion order (`timestamp` ascending) with Last-Write-Wins (LWW) conflict resolution applied per entity field.
+
+---
+
+## ⚡ Global Side Effects
+
+- **IndexedDB Storage:** Persistent client-side data allocation under database name `AppGanaderaDB`.
+- **Hardware Integration:** Requests user permission for Web NFC (`NDEFReader`), HTML5 Camera capture (`getUserMedia`), and Web Audio API for sensory feedback (RFID beeps).
+- **Service Worker Lifecycle:** Intercepts HTTP fetch events to cache application shell and static assets for seamless zero-connectivity operation.
+- **Remote Synchronization:** Dispatches HTTP POST requests to configured remote sync endpoints (`/api/sync`) when network connectivity is established.
+
+---
+
+## 🧪 System Verification
+
+To verify full TypeScript compilation and build the production bundle:
+
+```bash
+npm run build
+```
+
+To launch the local development server with network sharing:
+
+```bash
+npm run dev -- --host
+```
+
+---
+
 ## 🏃 Cómo Ejecutar y Probar la Versión Móvil
 
 ### 1. Iniciar el servidor local

@@ -22,6 +22,7 @@ import {
 import { db } from '../../db';
 import { syncEngine } from '../../sync/engine';
 import { pwaManager } from '../../pwa';
+import { playBeep } from '../../utils/sound';
 import type { Animal, Farm } from '../../types/animal';
 
 export type SimulatedDevice = 'none' | 'iphone15' | 'galaxyS24' | 'pixel8' | 'tablet';
@@ -52,24 +53,7 @@ export const MobileTesterDrawer: React.FC<MobileTesterDrawerProps> = ({
   const [recentRfids, setRecentRfids] = useState<string[]>([]);
   const [scaleSimulation, setScaleSimulation] = useState<{ weight: number; isStable: boolean } | null>(null);
 
-  // Play realistic scanner beep using Web Audio API
-  const playBeep = (freq = 1200, duration = 0.12) => {
-    try {
-      const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-      gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      osc.start();
-      osc.stop(audioCtx.currentTime + duration);
-    } catch (e) {
-      // AudioContext not allowed or muted
-    }
-  };
+
 
   // Inspect storage
   useEffect(() => {

@@ -10,8 +10,12 @@ const CURRENT_SEED_VERSION = 'v3_minimal';
 export async function seedDemoDataIfEmpty(forceReset = false) {
   const currentSavedVersion = localStorage.getItem('app_seed_version');
 
-  // If version changed or forceReset requested, clean and re-seed with minimal dataset
-  if (forceReset || currentSavedVersion !== CURRENT_SEED_VERSION) {
+  const farmCount = await db.farms.count();
+  const animalCount = await db.animals.count();
+  const hasExistingUserData = farmCount > 0 || animalCount > 0;
+
+  // If forceReset requested or (version changed AND database has no user data), clean and re-seed
+  if (forceReset || (currentSavedVersion !== CURRENT_SEED_VERSION && !hasExistingUserData)) {
     console.log('Cleaning up old demo data and applying minimal lean dataset...');
     try {
       await db.transaction('rw', [
@@ -29,15 +33,15 @@ export async function seedDemoDataIfEmpty(forceReset = false) {
         await db.healthRecords.clear();
         await db.financialRecords.clear();
       });
-      localStorage.setItem('app_seed_version', CURRENT_SEED_VERSION);
     } catch (e) {
       console.warn('Error clearing old tables:', e);
     }
   }
+  localStorage.setItem('app_seed_version', CURRENT_SEED_VERSION);
 
   // Check if data already exists
-  const farmCount = await db.farms.count();
-  if (farmCount > 0) {
+  const currentFarmCount = await db.farms.count();
+  if (currentFarmCount > 0) {
     return;
   }
 
@@ -205,6 +209,7 @@ export async function seedDemoDataIfEmpty(forceReset = false) {
   const reproEvents: ReproductionEvent[] = [
     {
       id: 'rep-1',
+      farmId: 'farm-1',
       animalId: 'cow-102',
       eventType: 'pregnancy_check',
       date: '2026-06-15',
@@ -231,6 +236,7 @@ export async function seedDemoDataIfEmpty(forceReset = false) {
     milkRecords.push(
       { 
         id: `milk-101-am-${i}`, 
+        farmId: 'farm-1',
         animalId: 'cow-101', 
         date: dateStr, 
         shift: 'AM', 
@@ -242,6 +248,7 @@ export async function seedDemoDataIfEmpty(forceReset = false) {
       },
       { 
         id: `milk-101-pm-${i}`, 
+        farmId: 'farm-1',
         animalId: 'cow-101', 
         date: dateStr, 
         shift: 'PM', 
@@ -259,6 +266,7 @@ export async function seedDemoDataIfEmpty(forceReset = false) {
   const weightRecords: WeightRecord[] = [
     { 
       id: 'w-103-1', 
+      farmId: 'farm-1',
       animalId: 'steer-103', 
       date: '2026-09-15', 
       weightKg: 370, 
@@ -267,6 +275,7 @@ export async function seedDemoDataIfEmpty(forceReset = false) {
     },
     { 
       id: 'w-103-2', 
+      farmId: 'farm-1',
       animalId: 'steer-103', 
       date: '2026-11-15', 
       weightKg: 420, 
@@ -281,6 +290,7 @@ export async function seedDemoDataIfEmpty(forceReset = false) {
   const healthRecords: HealthRecord[] = [
     {
       id: 'health-1',
+      farmId: 'farm-1',
       animalId: 'cow-101',
       date: '2026-10-10',
       type: 'vaccine',

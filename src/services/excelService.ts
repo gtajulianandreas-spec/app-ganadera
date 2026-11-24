@@ -2,6 +2,7 @@ import * as XLSX from 'xlsx';
 import type { Animal, LifeStage, Gender, Species, AnimalPurpose } from '../types/animal';
 import { db } from '../db';
 import { syncEngine } from '../sync/engine';
+import { generateId } from '../utils/id';
 
 export interface ImportPreviewRow {
   earTagCode: string;
@@ -16,6 +17,30 @@ export interface ImportPreviewRow {
   breedName: string;
   isValid: boolean;
   errors: string[];
+}
+
+export function parseExcelDate(raw: unknown): string {
+  if (typeof raw === 'number') {
+    // Número de serie Excel (días desde 1899-12-30)
+    const date = new Date(Math.round((raw - 25569) * 86400 * 1000));
+    return !isNaN(date.getTime()) ? date.toISOString().split('T')[0] : '2022-01-01';
+  }
+  if (typeof raw === 'string') {
+    const trimmed = raw.trim();
+    if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
+      return trimmed;
+    }
+    const num = Number(trimmed);
+    if (!isNaN(num) && num > 10000 && num < 60000) {
+      const date = new Date(Math.round((num - 25569) * 86400 * 1000));
+      if (!isNaN(date.getTime())) return date.toISOString().split('T')[0];
+    }
+    const parsed = new Date(trimmed);
+    if (!isNaN(parsed.getTime())) {
+      return parsed.toISOString().split('T')[0];
+    }
+  }
+  return '2022-01-01';
 }
 
 export class ExcelService {
@@ -55,7 +80,7 @@ export class ExcelService {
   }
 
   // Parse uploaded Excel or CSV file
-  public static async parseSpreadsheet(file: File): Promise<ImportPreviewRow[]> {
+  public static async parseSpreadsheet(file: File, farmId?: string): Promise<ImportPreviewRow[]> {
     const arrayBuffer = await file.arrayBuffer();
     const wb = XLSX.read(arrayBuffer, { type: 'array' });
     const wsName = wb.SheetNames[0];
@@ -65,7 +90,16 @@ export class ExcelService {
     const rawData = XLSX.utils.sheet_to_json<any[]>(ws, { header: 1 });
     if (rawData.length < 2) return [];
 
-    const existingTags = new Set((await db.animals.toArray()).map(a => a.earTagCode.toLowerCase()));
+    const allAnimals = await db.animals.toArray();
+    const farmAnimals = farmId && farmId !== 'all' 
+      ? allAnimals.filter(a => a.farmId === farmId)
+      : allAnimals;
+
+    const existingTags = new Set(farmAnimals.map(a => a.earTagCode.toLowerCase()));
+    const existingRfids = new Set(
+      allAnimals.filter(a => a.electronicId).map(a => a.electronicId!.toLowerCase())
+    );
+
     const previewRows: ImportPreviewRow[] = [];
 
     // Skip header row
@@ -78,7 +112,7 @@ export class ExcelService {
       const electronicId = row[2] ? String(row[2]).trim() : undefined;
       const speciesRaw = String(row[3] || 'bovine').toLowerCase().trim();
       const genderRaw = String(row[4] || 'female').toLowerCase().trim();
-      const birthDateRaw = String(row[5] || '').trim();
+      const birthDateRaw = row[5];
       const weightRaw = row[6] ? Number(row[6]) : undefined;
       const stageRaw = String(row[7] || 'adult').toLowerCase().trim();
       const purposeRaw = String(row[8] || 'dual_purpose').toLowerCase().trim();
@@ -89,7 +123,11 @@ export class ExcelService {
       if (!earTagCode) {
         errors.push('El arete o código es obligatorio.');
       } else if (existingTags.has(earTagCode.toLowerCase())) {
-        errors.push(`El arete ${earTagCode} ya existe en la base de datos.`);
+        errors.push(`El arete ${earTagCode} ya existe en esta finca.`);
+      }
+
+      if (electronicId && existingRfids.has(electronicId.toLowerCase())) {
+        errors.push(`El chip RFID ${electronicId} ya está registrado en la base de datos.`);
       }
 
       // Map gender
@@ -117,19 +155,8 @@ export class ExcelService {
       else if (purposeRaw.includes('carne') || purposeRaw.includes('ceba') || purposeRaw.includes('beef')) purpose = 'beef';
       else if (purposeRaw.includes('reprod') || purposeRaw.includes('cria') || purposeRaw.includes('breed')) purpose = 'breeding';
 
-      // Validate date
-      let birthDate = '2022-01-01';
-      if (birthDateRaw) {
-        if (/^\d{4}-\d{2}-\d{2}$/.test(birthDateRaw)) {
-          birthDate = birthDateRaw;
-        } else {
-          // Attempt parse
-          const parsedDate = new Date(birthDateRaw);
-          if (!isNaN(parsedDate.getTime())) {
-            birthDate = parsedDate.toISOString().split('T')[0];
-          }
-        }
-      }
+      // Parse birth date using resilient serial + ISO converter
+      const birthDate = parseExcelDate(birthDateRaw);
 
       previewRows.push({
         earTagCode,
@@ -156,7 +183,7 @@ export class ExcelService {
     if (validRows.length === 0) return 0;
 
     const animals: Animal[] = validRows.map(r => ({
-      id: 'anm_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
+      id: generateId('anm'),
       earTagCode: r.earTagCode,
       electronicId: r.electronicId,
       name: r.name || `Animal ${r.earTagCode}`,

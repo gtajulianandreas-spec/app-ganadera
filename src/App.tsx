@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Navbar } from './components/layout/Navbar';
 import { Sidebar, type AppTab } from './components/layout/Sidebar';
 import { MobileTabBar } from './components/layout/MobileTabBar';
-import { MobileTesterDrawer, type SimulatedDevice } from './components/testing/MobileTesterDrawer';
+import type { SimulatedDevice } from './components/testing/MobileTesterDrawer';
 import { AnimalList } from './components/animals/AnimalList';
 import { AnimalDetailModal } from './components/animals/AnimalDetailModal';
 import { CreateAnimalModal } from './components/animals/CreateAnimalModal';
@@ -14,8 +14,6 @@ import { WeightRecordsView } from './components/production/WeightRecordsView';
 import { HealthRecordsView } from './components/health/HealthRecordsView';
 import { FinancialDashboard } from './components/finance/FinancialDashboard';
 import { InvestorPortfolioView } from './components/finance/InvestorPortfolioView';
-import { BulkManagerModal } from './components/bulk/BulkManagerModal';
-import { CattleAiChatModal } from './components/ai/CattleAiChatModal';
 import { BackupRestoreModal } from './components/backup/BackupRestoreModal';
 import { RoleDashboardBanner } from './components/roles/RoleDashboardBanner';
 import { StageTransitionModal } from './components/animals/StageTransitionModal';
@@ -35,7 +33,19 @@ import type { ReproductionEvent } from './types/reproduction';
 import type { MilkingRecord, WeightRecord, HealthRecord } from './types/production';
 import type { FinancialRecord } from './types/finance';
 import type { UserRole } from './types/userRole';
+import { FarmProvider, type FarmContextValue } from './context/FarmContext';
 import { Smartphone } from 'lucide-react';
+
+// Lazy loaded heavy modules for rapid initial FCP/LCP
+const BulkManagerModal = React.lazy(() =>
+  import('./components/bulk/BulkManagerModal').then(m => ({ default: m.BulkManagerModal }))
+);
+const MobileTesterDrawer = React.lazy(() =>
+  import('./components/testing/MobileTesterDrawer').then(m => ({ default: m.MobileTesterDrawer }))
+);
+const CattleAiChatModal = React.lazy(() =>
+  import('./components/ai/CattleAiChatModal').then(m => ({ default: m.CattleAiChatModal }))
+);
 
 export const App: React.FC = () => {
   const [currentTab, setCurrentTab] = useState<AppTab>('animals');
@@ -72,6 +82,7 @@ export const App: React.FC = () => {
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [isWelcomeOpen, setIsWelcomeOpen] = useState(false);
   const [isChipScannerOpen, setIsChipScannerOpen] = useState(false);
+  const [chipScanCallback, setChipScanCallback] = useState<((code: string) => void) | null>(null);
   const [activeDevice, setActiveDevice] = useState<SimulatedDevice>('none');
 
   // Load all DB state
@@ -140,6 +151,22 @@ export const App: React.FC = () => {
     };
   }, [loadDatabaseState]);
 
+  // Pre-warm lazy modules in background when browser is idle to ensure offline pasture readiness
+  useEffect(() => {
+    const prewarm = () => {
+      import('./components/bulk/BulkManagerModal');
+      import('./components/testing/MobileTesterDrawer');
+      import('./components/ai/CattleAiChatModal');
+    };
+    if (typeof window !== 'undefined') {
+      if ('requestIdleCallback' in window) {
+        (window as unknown as { requestIdleCallback: (cb: () => void) => void }).requestIdleCallback(prewarm);
+      } else {
+        setTimeout(prewarm, 2000);
+      }
+    }
+  }, []);
+
   // Filter entities according to active farm selection ('all' vs specific farm)
   const isGlobal = selectedFarmId === 'all';
   const animalMap = useMemo(() => new Map(animals.map(a => [a.id, a])), [animals]);
@@ -161,34 +188,22 @@ export const App: React.FC = () => {
 
   const displayedReproEvents = useMemo(() => {
     if (isGlobal) return reproEvents;
-    return reproEvents.filter(r => {
-      const a = animalMap.get(r.animalId);
-      return a?.farmId === selectedFarmId;
-    });
+    return reproEvents.filter(r => (r.farmId ? r.farmId === selectedFarmId : animalMap.get(r.animalId)?.farmId === selectedFarmId));
   }, [isGlobal, reproEvents, animalMap, selectedFarmId]);
 
   const displayedMilking = useMemo(() => {
     if (isGlobal) return milkingRecords;
-    return milkingRecords.filter(m => {
-      const a = animalMap.get(m.animalId);
-      return a?.farmId === selectedFarmId;
-    });
+    return milkingRecords.filter(m => (m.farmId ? m.farmId === selectedFarmId : animalMap.get(m.animalId)?.farmId === selectedFarmId));
   }, [isGlobal, milkingRecords, animalMap, selectedFarmId]);
 
   const displayedWeights = useMemo(() => {
     if (isGlobal) return weightRecords;
-    return weightRecords.filter(w => {
-      const a = animalMap.get(w.animalId);
-      return a?.farmId === selectedFarmId;
-    });
+    return weightRecords.filter(w => (w.farmId ? w.farmId === selectedFarmId : animalMap.get(w.animalId)?.farmId === selectedFarmId));
   }, [isGlobal, weightRecords, animalMap, selectedFarmId]);
 
   const displayedHealth = useMemo(() => {
     if (isGlobal) return healthRecords;
-    return healthRecords.filter(h => {
-      const a = animalMap.get(h.animalId);
-      return a?.farmId === selectedFarmId;
-    });
+    return healthRecords.filter(h => (h.farmId ? h.farmId === selectedFarmId : animalMap.get(h.animalId)?.farmId === selectedFarmId));
   }, [isGlobal, healthRecords, animalMap, selectedFarmId]);
 
   const displayedFinances = useMemo(() => {
@@ -336,6 +351,17 @@ export const App: React.FC = () => {
   const milkingCount = displayedAnimals.filter(a => a.purpose === 'milk' && a.gender === 'female' && a.currentStage === 'adult').length;
   const activeWithdrawalCount = displayedHealth.filter(h => (h.safeMilkDate && h.safeMilkDate >= todayStr) || (h.safeMeatDate && h.safeMeatDate >= todayStr)).length;
 
+  // Centralized Farm & Role Context Value
+  const farmContextValue: FarmContextValue = useMemo(() => ({
+    selectedFarmId,
+    setSelectedFarmId,
+    farms,
+    currentRole,
+    setCurrentRole,
+    isGlobalView: selectedFarmId === 'all',
+    currentFarm: farms.find(f => f.id === selectedFarmId)
+  }), [selectedFarmId, farms, currentRole]);
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-6 text-center">
@@ -352,26 +378,23 @@ export const App: React.FC = () => {
 
   // Core App UI Content
   const appContent = (
-    <div className="min-h-screen bg-gray-50 flex flex-col antialiased pb-24 md:pb-8">
-      {/* Top Application Bar with Multi-Farm and Role Selector */}
-      <Navbar
-        farms={farms}
-        selectedFarmId={selectedFarmId}
-        onSelectFarm={id => setSelectedFarmId(id)}
-        onOpenCreateFarm={() => setIsCreateFarmOpen(true)}
-        currentTab={currentTab}
-        currentRole={currentRole}
-        onChangeRole={role => setCurrentRole(role)}
-        onOpenAlerts={() => setIsAlertsOpen(true)}
-        onOpenShare={() => setIsShareOpen(true)}
-        onOpenScanner={() => setIsChipScannerOpen(true)}
-        alertCount={smartAlerts.length}
-        onOpenStageConfig={() => setIsStageConfigOpen(true)}
-        onOpenAi={() => setIsAiOpen(true)}
-        onOpenBackup={() => setIsBackupOpen(true)}
-        onOpenBulk={() => setIsBulkOpen(true)}
-        onOpenMobileTester={() => setIsMobileTesterOpen(true)}
-      />
+    <FarmProvider value={farmContextValue}>
+      <div className="min-h-screen bg-gray-50 flex flex-col antialiased pb-24 md:pb-8">
+        {/* Top Application Bar with Multi-Farm and Role Selector */}
+        <Navbar
+          onOpenCreateFarm={() => setIsCreateFarmOpen(true)}
+          currentTab={currentTab}
+          onOpenAlerts={() => setIsAlertsOpen(true)}
+          onOpenShare={() => setIsShareOpen(true)}
+          onOpenScanner={() => setIsChipScannerOpen(true)}
+          alertCount={smartAlerts.length}
+          onOpenStageConfig={() => setIsStageConfigOpen(true)}
+          onOpenAi={() => setIsAiOpen(true)}
+          onOpenBackup={() => setIsBackupOpen(true)}
+          onOpenBulk={() => setIsBulkOpen(true)}
+          onOpenMobileTester={() => setIsMobileTesterOpen(true)}
+          isSimulatedMobile={activeDevice !== 'none'}
+        />
 
       <div className="flex-1 flex flex-col md:flex-row max-w-7xl w-full mx-auto p-3 sm:p-6 lg:p-8 gap-4 sm:gap-6">
         {/* Navigation Sidebar (Desktop only) */}
@@ -421,6 +444,7 @@ export const App: React.FC = () => {
                   onOpenCreate={() => setIsCreateAnimalOpen(true)}
                   onOpenBulk={() => setIsBulkOpen(true)}
                   onOpenScanner={() => setIsChipScannerOpen(true)}
+                  onOpenVisualSearch={() => setIsVisualSearchOpen(true)}
                 />
               )}
 
@@ -494,8 +518,6 @@ export const App: React.FC = () => {
         onOpenAlerts={() => setIsAlertsOpen(true)}
         onOpenShare={() => setIsShareOpen(true)}
         onOpenScanner={() => setIsChipScannerOpen(true)}
-        currentRole={currentRole}
-        onChangeRole={role => setCurrentRole(role)}
         alertCount={smartAlerts.length}
         counts={{
           animals: displayedAnimals.length,
@@ -524,6 +546,10 @@ export const App: React.FC = () => {
             setIsCreateAnimalOpen(false);
             loadDatabaseState();
           }}
+          onOpenScanner={cb => {
+            setChipScanCallback(() => cb);
+            setIsChipScannerOpen(true);
+          }}
         />
       )}
 
@@ -550,27 +576,32 @@ export const App: React.FC = () => {
       )}
 
       {isBulkOpen && (
-        <BulkManagerModal
-          lots={displayedLots}
-          onClose={() => setIsBulkOpen(false)}
-          onImportCompleted={() => {
-            setIsBulkOpen(false);
-            loadDatabaseState();
-          }}
-        />
+        <React.Suspense fallback={null}>
+          <BulkManagerModal
+            lots={displayedLots}
+            currentFarmId={selectedFarmId}
+            onClose={() => setIsBulkOpen(false)}
+            onImportCompleted={() => {
+              setIsBulkOpen(false);
+              loadDatabaseState();
+            }}
+          />
+        </React.Suspense>
       )}
 
       {isAiOpen && (
-        <CattleAiChatModal
-          farmId={selectedFarmId}
-          onClose={() => setIsAiOpen(false)}
-          onNavigateToTab={(tab: string) => {
-            setIsAiOpen(false);
-            if (['animals', 'reproduction', 'milking', 'weights', 'finance', 'health'].includes(tab)) {
-              setCurrentTab(tab as AppTab);
-            }
-          }}
-        />
+        <React.Suspense fallback={null}>
+          <CattleAiChatModal
+            farmId={selectedFarmId}
+            onClose={() => setIsAiOpen(false)}
+            onNavigateToTab={(tab: string) => {
+              setIsAiOpen(false);
+              if (['animals', 'reproduction', 'milking', 'weights', 'finance', 'health'].includes(tab)) {
+                setCurrentTab(tab as AppTab);
+              }
+            }}
+          />
+        </React.Suspense>
       )}
 
       {isBackupOpen && (
@@ -621,11 +652,22 @@ export const App: React.FC = () => {
       {/* Universal Chip Scanner Modal */}
       <UniversalChipScannerModal
         isOpen={isChipScannerOpen}
-        onClose={() => setIsChipScannerOpen(false)}
+        onClose={() => {
+          setIsChipScannerOpen(false);
+          setChipScanCallback(null);
+        }}
         animals={displayedAnimals}
         onSelectAnimal={animal => {
           setSelectedAnimalForDetail(animal);
           setIsChipScannerOpen(false);
+          setChipScanCallback(null);
+        }}
+        onScannedCode={code => {
+          if (chipScanCallback) {
+            chipScanCallback(code);
+            setIsChipScannerOpen(false);
+            setChipScanCallback(null);
+          }
         }}
       />
 
@@ -639,15 +681,20 @@ export const App: React.FC = () => {
       )}
 
       {/* Mobile Tester Drawer */}
-      <MobileTesterDrawer
-        isOpen={isMobileTesterOpen}
-        onClose={() => setIsMobileTesterOpen(false)}
-        activeDevice={activeDevice}
-        onSelectDevice={dev => setActiveDevice(dev)}
-        farms={farms}
-        onRefreshData={loadDatabaseState}
-      />
-    </div>
+      {isMobileTesterOpen && (
+        <React.Suspense fallback={null}>
+          <MobileTesterDrawer
+            isOpen={isMobileTesterOpen}
+            onClose={() => setIsMobileTesterOpen(false)}
+            activeDevice={activeDevice}
+            onSelectDevice={dev => setActiveDevice(dev)}
+            farms={farms}
+            onRefreshData={loadDatabaseState}
+          />
+        </React.Suspense>
+      )}
+      </div>
+    </FarmProvider>
   );
 
   // If a simulated mobile phone frame is active on desktop, wrap inside mockup

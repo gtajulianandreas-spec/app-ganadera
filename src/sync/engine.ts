@@ -1,6 +1,7 @@
 import { db } from '../db';
 import type { SyncOutboxAction, SyncStatus } from '../types/sync';
 import type { Animal } from '../types/animal';
+import { generateId } from '../utils/id';
 
 export class SyncEngine {
   private static instance: SyncEngine;
@@ -79,7 +80,7 @@ export class SyncEngine {
     payload: any
   ) {
     const action: SyncOutboxAction = {
-      id: 'evt_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
+      id: generateId('evt'),
       entityType,
       actionType,
       entityId,

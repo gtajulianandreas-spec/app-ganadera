@@ -14,12 +14,14 @@ import type { Lot } from '../../types/animal';
 
 interface BulkManagerModalProps {
   lots: Lot[];
+  currentFarmId?: string;
   onClose: () => void;
   onImportCompleted: (count: number) => void;
 }
 
 export const BulkManagerModal: React.FC<BulkManagerModalProps> = ({
   lots,
+  currentFarmId = 'farm-1',
   onClose,
   onImportCompleted
 }) => {
@@ -28,6 +30,8 @@ export const BulkManagerModal: React.FC<BulkManagerModalProps> = ({
   const [isProcessing, setIsProcessing] = useState(false);
   const [importedSuccessCount, setImportedSuccessCount] = useState<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const targetFarmId = currentFarmId && currentFarmId !== 'all' ? currentFarmId : 'farm-1';
 
   const handleDownloadTemplate = () => {
     const blob = ExcelService.generateTemplate();
@@ -47,7 +51,7 @@ export const BulkManagerModal: React.FC<BulkManagerModalProps> = ({
 
     setIsProcessing(true);
     try {
-      const rows = await ExcelService.parseSpreadsheet(file);
+      const rows = await ExcelService.parseSpreadsheet(file, targetFarmId);
       setPreviewRows(rows);
     } catch (err) {
       alert('Error al leer el archivo Excel/CSV. Verifica el formato.');
@@ -59,7 +63,7 @@ export const BulkManagerModal: React.FC<BulkManagerModalProps> = ({
   const handleCommit = async () => {
     setIsProcessing(true);
     try {
-      const count = await ExcelService.commitImport(previewRows, 'default_farm', selectedLotId || undefined);
+      const count = await ExcelService.commitImport(previewRows, targetFarmId, selectedLotId || undefined);
       setImportedSuccessCount(count);
       onImportCompleted(count);
     } catch (err) {

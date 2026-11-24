@@ -7,7 +7,7 @@ import { VisualSearchService } from '../../services/visualSearchService';
 import { samplePhotos } from '../../services/samplePhotos';
 import { GpsService, type GpsCoordinateResult } from '../../services/gpsService';
 import { StageTransitionEngine } from '../../services/stageTransitionEngine';
-import { UniversalChipScannerModal } from '../scanner/UniversalChipScannerModal';
+import { generateId } from '../../utils/id';
 
 interface CreateAnimalModalProps {
   lots: Lot[];
@@ -15,6 +15,7 @@ interface CreateAnimalModalProps {
   currentFarmId?: string;
   onClose: () => void;
   onCreated: (animal: Animal) => void;
+  onOpenScanner?: (onScanned: (code: string) => void) => void;
 }
 
 export const CreateAnimalModal: React.FC<CreateAnimalModalProps> = ({
@@ -22,7 +23,8 @@ export const CreateAnimalModal: React.FC<CreateAnimalModalProps> = ({
   farms,
   currentFarmId,
   onClose,
-  onCreated
+  onCreated,
+  onOpenScanner
 }) => {
   const [earTagCode, setEarTagCode] = useState('');
   const [electronicId, setElectronicId] = useState('');
@@ -44,7 +46,6 @@ export const CreateAnimalModal: React.FC<CreateAnimalModalProps> = ({
   const [gpsLoading, setGpsLoading] = useState(false);
   const [gpsLocation, setGpsLocation] = useState<GpsCoordinateResult | null>(null);
   const [gpsError, setGpsError] = useState<string | null>(null);
-  const [isScannerOpen, setIsScannerOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleCaptureGps = async () => {
@@ -99,15 +100,32 @@ export const CreateAnimalModal: React.FC<CreateAnimalModalProps> = ({
       return;
     }
 
-    // Check duplicate tag code
-    const existing = await db.animals.where('earTagCode').equalsIgnoreCase(earTagCode.trim()).first();
-    if (existing) {
-      setError(`Ya existe un animal registrado con el arete ${earTagCode}.`);
+    // 1. Check duplicate visual ear tag code in active farm
+    const existingTag = await db.animals
+      .where('farmId')
+      .equals(selectedFarmId)
+      .and(a => a.earTagCode.toLowerCase() === earTagCode.trim().toLowerCase())
+      .first();
+
+    if (existingTag) {
+      setError(`Ya existe un animal registrado con el arete ${earTagCode} en esta finca.`);
       return;
     }
 
+    // 2. Check electronic RFID chip globally across all farms (ISO 11784/11785)
+    if (electronicId.trim()) {
+      const existingRfid = await db.animals
+        .where('electronicId')
+        .equalsIgnoreCase(electronicId.trim())
+        .first();
+      if (existingRfid) {
+        setError(`El chip RFID ${electronicId} ya está registrado en la base de datos.`);
+        return;
+      }
+    }
+
     const newAnimal: Animal = {
-      id: 'anm_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
+      id: generateId('anm'),
       earTagCode: earTagCode.trim(),
       electronicId: electronicId.trim() || undefined,
       name: name.trim() || undefined,
@@ -287,7 +305,7 @@ export const CreateAnimalModal: React.FC<CreateAnimalModalProps> = ({
                 </label>
                 <button
                   type="button"
-                  onClick={() => setIsScannerOpen(true)}
+                  onClick={() => onOpenScanner && onOpenScanner((code) => setElectronicId(code))}
                   className="text-[11px] font-bold text-amber-700 hover:text-amber-800 flex items-center space-x-1"
                 >
                   <Radio className="w-3 h-3 text-amber-600 animate-pulse" />
@@ -515,14 +533,6 @@ export const CreateAnimalModal: React.FC<CreateAnimalModalProps> = ({
           </div>
         </form>
       </div>
-
-      <UniversalChipScannerModal
-        isOpen={isScannerOpen}
-        onClose={() => setIsScannerOpen(false)}
-        animals={[]}
-        onScannedCode={(code) => setElectronicId(code)}
-        title="Escanear Chip / Arete del Animal"
-      />
     </div>
   );
 };

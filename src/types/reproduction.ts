@@ -11,6 +11,7 @@ export type PregnancyResult = 'pregnant' | 'open' | 'doubtful';
 
 export interface ReproductionEvent {
   id: string; // UUIDv7
+  farmId?: string;
   animalId: string;
   eventType: ReproductionEventType;
   date: string; // YYYY-MM-DD

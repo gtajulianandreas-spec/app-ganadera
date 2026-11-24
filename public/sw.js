@@ -1,4 +1,4 @@
-const CACHE_NAME = 'app-ganadera-v1';
+const CACHE_NAME = 'app-ganadera-v2';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -29,24 +29,32 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Fetch: Cache-first for assets, network fallback with offline support
+// Fetch: Cache-first for static immutable assets, stale-while-revalidate for dynamic content
 self.addEventListener('fetch', (event) => {
   // Only handle GET requests
   if (event.request.method !== 'GET') return;
 
   const url = new URL(event.request.url);
 
-  // Ignore browser extensions or external non-http
+  // Ignore browser extensions or external protocols
   if (!url.protocol.startsWith('http')) return;
+
+  const isHashedAsset = url.pathname.startsWith('/assets/');
 
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
+      // If we have a cached version of a hashed immutable asset, serve it immediately
+      if (cachedResponse && isHashedAsset) {
+        return cachedResponse;
+      }
+
       if (cachedResponse) {
-        // Fetch in background to update cache (stale-while-revalidate)
+        // Stale-while-revalidate for mutable shell documents
         fetch(event.request)
           .then((networkResponse) => {
             if (networkResponse && networkResponse.status === 200) {
-              caches.open(CACHE_NAME).then((cache) => cache.put(event.request, networkResponse));
+              const clone = networkResponse.clone();
+              caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
             }
           })
           .catch(() => {
@@ -55,10 +63,10 @@ self.addEventListener('fetch', (event) => {
         return cachedResponse;
       }
 
-      // Not in cache: fetch from network and cache
+      // Not in cache: fetch from network and dynamically cache
       return fetch(event.request)
         .then((networkResponse) => {
-          if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
+          if (!networkResponse || networkResponse.status !== 200) {
             return networkResponse;
           }
           const responseToCache = networkResponse.clone();
@@ -68,10 +76,12 @@ self.addEventListener('fetch', (event) => {
           return networkResponse;
         })
         .catch(() => {
-          // If offline and request is HTML/navigation, serve /index.html
+          // If offline and request is HTML/navigation, serve cached /index.html
           if (event.request.headers.get('accept')?.includes('text/html')) {
             return caches.match('/index.html');
           }
+          // Return null/empty fallback for failed assets when offline
+          return new Response('', { status: 503, statusText: 'Offline - Resource unavailable' });
         });
     })
   );
