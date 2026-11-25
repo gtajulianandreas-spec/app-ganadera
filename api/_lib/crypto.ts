@@ -1,9 +1,9 @@
 import crypto from 'node:crypto';
-import { hash as argon2Hash, verify as argon2Verify, Algorithm } from '@node-rs/argon2';
+import { hash as argon2Hash, verify as argon2Verify } from '@node-rs/argon2';
 
 // OWASP Password Storage Cheat Sheet recommended Argon2id parameters
 const ARGON2_OPTIONS = {
-  algorithm: Algorithm.Argon2id,
+  algorithm: 2, // Algorithm.Argon2id (numeric literal avoids TS2748 under isolatedModules)
   memoryCost: 19456, // 19 MiB
   timeCost: 2,
   parallelism: 1,
