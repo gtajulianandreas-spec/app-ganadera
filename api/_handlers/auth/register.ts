@@ -1,18 +1,18 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { z } from 'zod';
-import { query, withTransaction } from '../_lib/db.js';
+import { query, withTransaction } from '../../_lib/db.js';
 import {
   escapeHtml,
   generateSecureToken,
   hashIp,
   sha256,
   validateAndHashNewPassword,
-} from '../_lib/crypto.js';
-import { getAppBaseUrl, getPrivacyPolicyVersion, getServerPepper } from '../_lib/env.js';
-import { getClientIp, getUserAgent, parseJsonBody, sendJson, verifyCsrfProtection } from '../_lib/http.js';
-import { checkRateLimit } from '../_lib/rateLimit.js';
-import { sendTransactionalEmail } from '../_lib/email.js';
-import { recordSecurityEvent } from '../_lib/audit.js';
+} from '../../_lib/crypto.js';
+import { getAppBaseUrl, getPrivacyPolicyVersion, getServerPepper } from '../../_lib/env.js';
+import { getClientIp, getUserAgent, parseJsonBody, sendJson, verifyCsrfProtection } from '../../_lib/http.js';
+import { checkRateLimit } from '../../_lib/rateLimit.js';
+import { sendTransactionalEmail } from '../../_lib/email.js';
+import { recordSecurityEvent } from '../../_lib/audit.js';
 
 const RegisterSchema = z.object({
   email: z.string().trim().email('Ingresa un correo electrónico válido.').max(254),

@@ -1,12 +1,12 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { z } from 'zod';
-import { query } from '../_lib/db.js';
-import { hashIp, sha256, verifyPassword } from '../_lib/crypto.js';
-import { getServerPepper } from '../_lib/env.js';
-import { getClientIp, parseJsonBody, sendJson, verifyCsrfProtection } from '../_lib/http.js';
-import { checkRateLimit, resetRateLimit } from '../_lib/rateLimit.js';
-import { createSessionCookies } from '../_lib/session.js';
-import { recordSecurityEvent } from '../_lib/audit.js';
+import { query } from '../../_lib/db.js';
+import { hashIp, sha256, verifyPassword } from '../../_lib/crypto.js';
+import { getServerPepper } from '../../_lib/env.js';
+import { getClientIp, parseJsonBody, sendJson, verifyCsrfProtection } from '../../_lib/http.js';
+import { checkRateLimit, resetRateLimit } from '../../_lib/rateLimit.js';
+import { createSessionCookies } from '../../_lib/session.js';
+import { recordSecurityEvent } from '../../_lib/audit.js';
 
 const LoginSchema = z.object({
   email: z.string().trim().email('Correo inválido.').max(254),

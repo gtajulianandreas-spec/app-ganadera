@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { sendJson, verifyCsrfProtection } from '../_lib/http.js';
-import { clearSessionCookies, getAuthenticatedSession, revokeSessionById } from '../_lib/session.js';
-import { recordSecurityEvent } from '../_lib/audit.js';
+import { sendJson, verifyCsrfProtection } from '../../_lib/http.js';
+import { clearSessionCookies, getAuthenticatedSession, revokeSessionById } from '../../_lib/session.js';
+import { recordSecurityEvent } from '../../_lib/audit.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse): Promise<void> {
   if (req.method !== 'POST') {

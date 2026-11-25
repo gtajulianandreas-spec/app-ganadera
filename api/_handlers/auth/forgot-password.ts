@@ -1,12 +1,12 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { z } from 'zod';
-import { query, withTransaction } from '../_lib/db.js';
-import { escapeHtml, generateSecureToken, hashIp, sha256 } from '../_lib/crypto.js';
-import { getAppBaseUrl, getServerPepper } from '../_lib/env.js';
-import { getClientIp, parseJsonBody, sendJson, verifyCsrfProtection } from '../_lib/http.js';
-import { checkRateLimit } from '../_lib/rateLimit.js';
-import { sendTransactionalEmail } from '../_lib/email.js';
-import { recordSecurityEvent } from '../_lib/audit.js';
+import { query, withTransaction } from '../../_lib/db.js';
+import { escapeHtml, generateSecureToken, hashIp, sha256 } from '../../_lib/crypto.js';
+import { getAppBaseUrl, getServerPepper } from '../../_lib/env.js';
+import { getClientIp, parseJsonBody, sendJson, verifyCsrfProtection } from '../../_lib/http.js';
+import { checkRateLimit } from '../../_lib/rateLimit.js';
+import { sendTransactionalEmail } from '../../_lib/email.js';
+import { recordSecurityEvent } from '../../_lib/audit.js';
 
 const ForgotSchema = z.object({
   email: z.string().trim().email('Ingresa un correo electrónico válido.').max(254),

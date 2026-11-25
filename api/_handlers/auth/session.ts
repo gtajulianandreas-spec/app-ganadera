@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { query } from '../_lib/db.js';
-import { sendJson } from '../_lib/http.js';
-import { getAuthenticatedSession } from '../_lib/session.js';
+import { query } from '../../_lib/db.js';
+import { sendJson } from '../../_lib/http.js';
+import { getAuthenticatedSession } from '../../_lib/session.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse): Promise<void> {
   if (req.method !== 'GET') {

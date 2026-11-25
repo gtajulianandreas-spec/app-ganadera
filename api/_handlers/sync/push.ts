@@ -1,9 +1,9 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { z } from 'zod';
-import { withUserTransaction } from '../_lib/db.js';
-import { parseJsonBody, sendJson, verifyCsrfProtection } from '../_lib/http.js';
-import { checkRateLimit } from '../_lib/rateLimit.js';
-import { getAuthenticatedSession } from '../_lib/session.js';
+import { withUserTransaction } from '../../_lib/db.js';
+import { parseJsonBody, sendJson, verifyCsrfProtection } from '../../_lib/http.js';
+import { checkRateLimit } from '../../_lib/rateLimit.js';
+import { getAuthenticatedSession } from '../../_lib/session.js';
 
 const SyncActionSchema = z.object({
   id: z.string().min(1).max(128),

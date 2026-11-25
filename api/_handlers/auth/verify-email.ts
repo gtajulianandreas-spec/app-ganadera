@@ -1,12 +1,12 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { z } from 'zod';
-import { withTransaction } from '../_lib/db.js';
-import { hashIp, sha256 } from '../_lib/crypto.js';
-import { getServerPepper } from '../_lib/env.js';
-import { getClientIp, parseJsonBody, sendJson, verifyCsrfProtection } from '../_lib/http.js';
-import { checkRateLimit } from '../_lib/rateLimit.js';
-import { revokeAllUserSessions } from '../_lib/session.js';
-import { recordSecurityEvent } from '../_lib/audit.js';
+import { withTransaction } from '../../_lib/db.js';
+import { hashIp, sha256 } from '../../_lib/crypto.js';
+import { getServerPepper } from '../../_lib/env.js';
+import { getClientIp, parseJsonBody, sendJson, verifyCsrfProtection } from '../../_lib/http.js';
+import { checkRateLimit } from '../../_lib/rateLimit.js';
+import { revokeAllUserSessions } from '../../_lib/session.js';
+import { recordSecurityEvent } from '../../_lib/audit.js';
 
 const VerifySchema = z.object({
   token: z.string().min(16, 'Token inválido.').max(256),

@@ -1,13 +1,13 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { z } from 'zod';
-import { query, withTransaction } from '../_lib/db.js';
-import { generateSecureToken, hashIp, sha256, verifyPassword } from '../_lib/crypto.js';
-import { getAppBaseUrl, getPrivacyPolicyVersion, getServerPepper } from '../_lib/env.js';
-import { getClientIp, getUserAgent, parseJsonBody, sendJson, verifyCsrfProtection } from '../_lib/http.js';
-import { checkRateLimit } from '../_lib/rateLimit.js';
-import { clearSessionCookies, getAuthenticatedSession } from '../_lib/session.js';
-import { sendTransactionalEmail } from '../_lib/email.js';
-import { recordSecurityEvent } from '../_lib/audit.js';
+import { query, withTransaction } from '../../_lib/db.js';
+import { generateSecureToken, hashIp, sha256, verifyPassword } from '../../_lib/crypto.js';
+import { getAppBaseUrl, getPrivacyPolicyVersion, getServerPepper } from '../../_lib/env.js';
+import { getClientIp, getUserAgent, parseJsonBody, sendJson, verifyCsrfProtection } from '../../_lib/http.js';
+import { checkRateLimit } from '../../_lib/rateLimit.js';
+import { clearSessionCookies, getAuthenticatedSession } from '../../_lib/session.js';
+import { sendTransactionalEmail } from '../../_lib/email.js';
+import { recordSecurityEvent } from '../../_lib/audit.js';
 
 const UpdateProfileSchema = z.object({
   fullName: z.string().trim().min(2).max(120).optional(),

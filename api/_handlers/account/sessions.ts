@@ -1,9 +1,9 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { z } from 'zod';
-import { query } from '../_lib/db.js';
-import { parseJsonBody, sendJson, verifyCsrfProtection } from '../_lib/http.js';
-import { getAuthenticatedSession, revokeAllUserSessions } from '../_lib/session.js';
-import { recordSecurityEvent } from '../_lib/audit.js';
+import { query } from '../../_lib/db.js';
+import { parseJsonBody, sendJson, verifyCsrfProtection } from '../../_lib/http.js';
+import { getAuthenticatedSession, revokeAllUserSessions } from '../../_lib/session.js';
+import { recordSecurityEvent } from '../../_lib/audit.js';
 
 const RevokeSchema = z.object({
   sessionIdPrefix: z.string().regex(/^[a-f0-9]{12,64}$/, 'Identificador de sesión inválido.').optional(),

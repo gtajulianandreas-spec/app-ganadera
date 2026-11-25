@@ -1,11 +1,11 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { z } from 'zod';
-import { query, withTransaction } from '../_lib/db.js';
-import { validateAndHashNewPassword, verifyPassword } from '../_lib/crypto.js';
-import { parseJsonBody, sendJson, verifyCsrfProtection } from '../_lib/http.js';
-import { checkRateLimit } from '../_lib/rateLimit.js';
-import { createSessionCookies, getAuthenticatedSession } from '../_lib/session.js';
-import { recordSecurityEvent } from '../_lib/audit.js';
+import { query, withTransaction } from '../../_lib/db.js';
+import { validateAndHashNewPassword, verifyPassword } from '../../_lib/crypto.js';
+import { parseJsonBody, sendJson, verifyCsrfProtection } from '../../_lib/http.js';
+import { checkRateLimit } from '../../_lib/rateLimit.js';
+import { createSessionCookies, getAuthenticatedSession } from '../../_lib/session.js';
+import { recordSecurityEvent } from '../../_lib/audit.js';
 
 const ChangePasswordSchema = z.object({
   currentPassword: z.string().optional(),

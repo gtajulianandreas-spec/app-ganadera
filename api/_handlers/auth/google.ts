@@ -1,10 +1,10 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import * as oauth from 'oauth4webapi';
-import { query } from '../_lib/db.js';
-import { generateSecureToken, hashIp, sha256 } from '../_lib/crypto.js';
-import { getGoogleOAuthConfig, getServerPepper, isProduction } from '../_lib/env.js';
-import { appendSetCookie, getClientIp, sanitizeRedirectPath, sendJson, serializeCookie } from '../_lib/http.js';
-import { checkRateLimit } from '../_lib/rateLimit.js';
+import { query } from '../../_lib/db.js';
+import { generateSecureToken, hashIp, sha256 } from '../../_lib/crypto.js';
+import { getGoogleOAuthConfig, getServerPepper, isProduction } from '../../_lib/env.js';
+import { appendSetCookie, getClientIp, sanitizeRedirectPath, sendJson, serializeCookie } from '../../_lib/http.js';
+import { checkRateLimit } from '../../_lib/rateLimit.js';
 
 export const OAUTH_STATE_COOKIE = 'ag_oauth_state';
 

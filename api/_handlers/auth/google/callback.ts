@@ -1,8 +1,8 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { createRemoteJWKSet, jwtVerify } from 'jose';
-import { query, withTransaction } from '../../_lib/db.js';
-import { hashIp, sha256, timingSafeEqualHex } from '../../_lib/crypto.js';
-import { getGoogleOAuthConfig, getPrivacyPolicyVersion, getServerPepper, isProduction } from '../../_lib/env.js';
+import { query, withTransaction } from '../../../_lib/db.js';
+import { hashIp, sha256, timingSafeEqualHex } from '../../../_lib/crypto.js';
+import { getGoogleOAuthConfig, getPrivacyPolicyVersion, getServerPepper, isProduction } from '../../../_lib/env.js';
 import {
   appendSetCookie,
   getClientIp,
@@ -10,9 +10,9 @@ import {
   parseCookies,
   sanitizeRedirectPath,
   serializeCookie,
-} from '../../_lib/http.js';
-import { createSessionCookies } from '../../_lib/session.js';
-import { recordSecurityEvent } from '../../_lib/audit.js';
+} from '../../../_lib/http.js';
+import { createSessionCookies } from '../../../_lib/session.js';
+import { recordSecurityEvent } from '../../../_lib/audit.js';
 import { OAUTH_STATE_COOKIE } from '../google.js';
 
 const GOOGLE_JWKS = createRemoteJWKSet(new URL('https://www.googleapis.com/oauth2/v3/certs'));

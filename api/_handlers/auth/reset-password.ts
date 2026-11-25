@@ -1,9 +1,9 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { z } from 'zod';
-import { withTransaction } from '../_lib/db.js';
-import { sha256, validateAndHashNewPassword } from '../_lib/crypto.js';
-import { parseJsonBody, sendJson, verifyCsrfProtection } from '../_lib/http.js';
-import { recordSecurityEvent } from '../_lib/audit.js';
+import { withTransaction } from '../../_lib/db.js';
+import { sha256, validateAndHashNewPassword } from '../../_lib/crypto.js';
+import { parseJsonBody, sendJson, verifyCsrfProtection } from '../../_lib/http.js';
+import { recordSecurityEvent } from '../../_lib/audit.js';
 
 const ResetSchema = z.object({
   token: z.string().min(16, 'Token inválido.').max(256),

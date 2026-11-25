@@ -1,8 +1,8 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { withUserTransaction } from '../_lib/db.js';
-import { sendJson } from '../_lib/http.js';
-import { checkRateLimit } from '../_lib/rateLimit.js';
-import { getAuthenticatedSession } from '../_lib/session.js';
+import { withUserTransaction } from '../../_lib/db.js';
+import { sendJson } from '../../_lib/http.js';
+import { checkRateLimit } from '../../_lib/rateLimit.js';
+import { getAuthenticatedSession } from '../../_lib/session.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse): Promise<void> {
   if (req.method !== 'GET') {
