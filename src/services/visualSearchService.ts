@@ -190,20 +190,29 @@ export class VisualSearchService {
   }
 
   /**
-   * Search an animal among a list of animals using a query photo
+   * Search an animal among a list of animals using a query photo.
+   * Uses precomputed photoFeatures when available to avoid O(N) JPEG/Canvas decoding.
    */
   public static async searchByPhoto(
     queryImageUrl: string,
-    candidateAnimals: Array<{ id: string; earTagCode: string; name?: string; photoUrl?: string; breedComposition: any[] }>
+    candidateAnimals: Array<{
+      id: string;
+      earTagCode: string;
+      name?: string;
+      photoUrl?: string;
+      photoFeatures?: ImageFeatureVector;
+      breedComposition: any[];
+    }>
   ): Promise<VisualMatchResult[]> {
     const queryFeatures = await this.extractFeatures(queryImageUrl);
 
     const results: VisualMatchResult[] = [];
 
     for (const animal of candidateAnimals) {
-      if (!animal.photoUrl) continue;
+      if (!animal.photoUrl && !animal.photoFeatures) continue;
 
-      const targetFeatures = await this.extractFeatures(animal.photoUrl);
+      const targetFeatures =
+        animal.photoFeatures ?? (await this.extractFeatures(animal.photoUrl!));
       const similarity = this.compareFeatures(queryFeatures, targetFeatures);
 
       const reasons: string[] = [];

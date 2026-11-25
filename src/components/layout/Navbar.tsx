@@ -30,6 +30,8 @@ import type { UserRole } from '../../types/userRole';
 import { USER_ROLES } from '../../types/userRole';
 import { pwaManager } from '../../pwa';
 import { useFarmContext } from '../../context/FarmContext';
+import { useOptionalAuth } from '../../context/AuthContext';
+import { LogIn, User as UserIcon } from 'lucide-react';
 
 interface NavbarProps {
   farms?: Farm[];
@@ -42,6 +44,8 @@ interface NavbarProps {
   onOpenMobileTester: () => void;
   onOpenShare?: () => void;
   onOpenScanner?: () => void;
+  onOpenAuth?: () => void;
+  onOpenAccount?: () => void;
   currentTab: string;
   currentRole?: UserRole;
   onChangeRole?: (role: UserRole) => void;
@@ -62,6 +66,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenMobileTester,
   onOpenShare,
   onOpenScanner,
+  onOpenAuth,
+  onOpenAccount,
   currentRole,
   onChangeRole,
   onOpenAlerts,
@@ -147,6 +153,10 @@ export const Navbar: React.FC<NavbarProps> = ({
   const effectiveOnSelectFarm = onSelectFarm || farmContext?.setSelectedFarmId || (() => {});
   const effectiveRole = currentRole || farmContext?.currentRole || 'admin';
   const effectiveOnChangeRole = onChangeRole || farmContext?.setCurrentRole || (() => {});
+
+  const authContext = useOptionalAuth();
+  const isAuthenticated = authContext?.isAuthenticated || false;
+  const authUser = authContext?.user || null;
 
   const currentFarm = effectiveFarms.find(f => f.id === effectiveSelectedFarmId);
   const isGlobalView = effectiveSelectedFarmId === 'all';
@@ -446,6 +456,29 @@ export const Navbar: React.FC<NavbarProps> = ({
                       <div>
                         <div className="font-bold text-ranch-900">Instalar Aplicación (PWA)</div>
                         <div className="text-[11px] text-ranch-700">Acceso directo y soporte offline</div>
+                      </div>
+                    </button>
+                  )}
+
+                  {(onOpenAuth || onOpenAccount) && (
+                    <button
+                      onClick={() => {
+                        setIsToolsDropdownOpen(false);
+                        if (isAuthenticated && onOpenAccount) onOpenAccount();
+                        else if (onOpenAuth) onOpenAuth();
+                      }}
+                      className="w-full flex items-center space-x-2.5 px-3.5 py-2.5 text-xs text-left hover:bg-gray-50 text-gray-800 transition-colors border-t border-gray-100"
+                    >
+                      <div className="w-7 h-7 rounded-lg bg-ranch-50 text-ranch-700 flex items-center justify-center shrink-0">
+                        {isAuthenticated ? <UserIcon className="w-4 h-4" /> : <LogIn className="w-4 h-4" />}
+                      </div>
+                      <div>
+                        <div className="font-semibold text-gray-900">
+                          {isAuthenticated ? 'Mi Cuenta y Seguridad' : 'Iniciar Sesión / Registro'}
+                        </div>
+                        <div className="text-[11px] text-gray-400">
+                          {isAuthenticated ? authUser?.email : 'Google, correo y privacidad Ley 1581'}
+                        </div>
                       </div>
                     </button>
                   )}

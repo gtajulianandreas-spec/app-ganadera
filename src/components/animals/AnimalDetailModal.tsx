@@ -20,6 +20,7 @@ import type { MilkingRecord, WeightRecord, HealthRecord } from '../../types/prod
 import type { ReproductionEvent } from '../../types/reproduction';
 import { db } from '../../db';
 import { VisualSearchService } from '../../services/visualSearchService';
+import { syncEngine } from '../../sync/engine';
 
 interface AnimalDetailModalProps {
   animal: Animal;
@@ -48,7 +49,22 @@ export const AnimalDetailModal: React.FC<AnimalDetailModalProps> = ({
 
     try {
       const compressed = await VisualSearchService.compressImage(file);
-      await db.animals.update(animal.id, { photoUrl: compressed, updatedAt: Date.now() });
+      const photoFeatures = await VisualSearchService.extractFeatures(compressed);
+      const now = Date.now();
+      const nextVersion = (animal.version || 1) + 1;
+      await db.animals.update(animal.id, {
+        photoUrl: compressed,
+        photoFeatures,
+        updatedAt: now,
+        version: nextVersion
+      });
+      await syncEngine.queueAction('animal', 'update', animal.id, {
+        ...animal,
+        photoUrl: compressed,
+        photoFeatures,
+        updatedAt: now,
+        version: nextVersion
+      });
       setCurrentPhoto(compressed);
       if (onRefresh) onRefresh();
     } catch (err) {

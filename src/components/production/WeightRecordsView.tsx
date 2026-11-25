@@ -3,7 +3,7 @@ import { Scale, Plus, Bluetooth, Check, TrendingUp } from 'lucide-react';
 import type { WeightRecord } from '../../types/production';
 import type { Animal } from '../../types/animal';
 import { db } from '../../db';
-import { syncEngine } from '../../sync/engine';
+import { saveEntityWithOutbox } from '../../db/mutations';
 import { generateId } from '../../utils/id';
 
 interface WeightRecordsViewProps {
@@ -69,10 +69,9 @@ export const WeightRecordsView: React.FC<WeightRecordsViewProps> = ({
       createdAt: Date.now()
     };
 
-    await db.weightRecords.put(newWeight);
+    await saveEntityWithOutbox(db.weightRecords, 'weight', 'create', newWeight);
     // Update animal's current weight
     await db.animals.update(selectedAnimalId, { currentWeightKg: Number(weightKg) });
-    await syncEngine.queueAction('weight', 'create', newWeight.id, newWeight);
 
     setShowAddModal(false);
     onRefresh();

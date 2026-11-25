@@ -1,4 +1,4 @@
-const CACHE_NAME = 'app-ganadera-v3';
+const CACHE_NAME = 'app-ganadera-v4';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -29,12 +29,13 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Fetch: Network-first for HTML documents, Cache-first for immutable hashed assets
+// Fetch: NEVER cache /api/* or cross-origin requests; Network-first for HTML, Cache-first for hashed assets
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
 
   const url = new URL(event.request.url);
   if (!url.protocol.startsWith('http')) return;
+  if (url.origin !== self.location.origin || url.pathname.startsWith('/api/')) return;
 
   const isHtmlRequest =
     event.request.mode === 'navigate' ||

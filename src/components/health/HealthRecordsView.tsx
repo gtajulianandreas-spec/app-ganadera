@@ -16,7 +16,7 @@ import {
 import type { HealthRecord, DoseUnit } from '../../types/production';
 import type { Animal } from '../../types/animal';
 import { db } from '../../db';
-import { syncEngine } from '../../sync/engine';
+import { saveEntityWithOutbox } from '../../db/mutations';
 import { GpsService, type GpsCoordinateResult } from '../../services/gpsService';
 import { generateId } from '../../utils/id';
 
@@ -130,8 +130,7 @@ export const HealthRecordsView: React.FC<HealthRecordsViewProps> = ({
       createdAt: Date.now()
     };
 
-    await db.healthRecords.put(record);
-    await syncEngine.queueAction('health', 'create', record.id, record);
+    await saveEntityWithOutbox(db.healthRecords, 'health', 'create', record);
     setShowAddModal(false);
     setGpsLocation(null);
     onRefresh();

@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { X, Tag, Save, Radio, Camera, Upload, Trash2, Image as ImageIcon, MapPin, Loader2, Sparkles } from 'lucide-react';
 import type { Animal, Lot, Species, Gender, LifeStage, AnimalPurpose, Farm } from '../../types/animal';
 import { db } from '../../db';
-import { syncEngine } from '../../sync/engine';
+import { saveEntityWithOutbox } from '../../db/mutations';
 import { VisualSearchService } from '../../services/visualSearchService';
 import { samplePhotos } from '../../services/samplePhotos';
 import { GpsService, type GpsCoordinateResult } from '../../services/gpsService';
@@ -124,6 +124,10 @@ export const CreateAnimalModal: React.FC<CreateAnimalModalProps> = ({
       }
     }
 
+    const photoFeatures = photoUrl
+      ? await VisualSearchService.extractFeatures(photoUrl)
+      : undefined;
+
     const newAnimal: Animal = {
       id: generateId('anm'),
       earTagCode: earTagCode.trim(),
@@ -147,13 +151,13 @@ export const CreateAnimalModal: React.FC<CreateAnimalModalProps> = ({
         recordedAt: Date.now()
       } : undefined,
       notes: notes.trim() || undefined,
+      photoFeatures,
       createdAt: Date.now(),
       updatedAt: Date.now(),
       version: 1
     };
 
-    await db.animals.put(newAnimal);
-    await syncEngine.queueAction('animal', 'create', newAnimal.id, newAnimal);
+    await saveEntityWithOutbox(db.animals, 'animal', 'create', newAnimal);
 
     onCreated(newAnimal);
     onClose();

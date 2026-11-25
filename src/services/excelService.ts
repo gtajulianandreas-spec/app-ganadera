@@ -1,8 +1,9 @@
-import * as XLSX from 'xlsx';
 import type { Animal, LifeStage, Gender, Species, AnimalPurpose } from '../types/animal';
 import { db } from '../db';
 import { syncEngine } from '../sync/engine';
 import { generateId } from '../utils/id';
+
+const loadXlsx = () => import('xlsx');
 
 export interface ImportPreviewRow {
   earTagCode: string;
@@ -45,7 +46,8 @@ export function parseExcelDate(raw: unknown): string {
 
 export class ExcelService {
   // Generate a starter template Excel file for farmers
-  public static generateTemplate(): Blob {
+  public static async generateTemplate(): Promise<Blob> {
+    const XLSX = await loadXlsx();
     const headers = [
       ['Arete / Codigo (Obligatorio)', 'Nombre', 'Chip / RFID', 'Especie (bovine/buffalo/equine/porcine/ovine)', 'Sexo (female/male/castrated)', 'Fecha Nacimiento (AAAA-MM-DD)', 'Peso Actual (Kg)', 'Etapa (calf/weaned/juvenile/adult)', 'Proposito (milk/beef/dual_purpose/breeding)', 'Raza Principal']
     ];
@@ -81,6 +83,7 @@ export class ExcelService {
 
   // Parse uploaded Excel or CSV file
   public static async parseSpreadsheet(file: File, farmId?: string): Promise<ImportPreviewRow[]> {
+    const XLSX = await loadXlsx();
     const arrayBuffer = await file.arrayBuffer();
     const wb = XLSX.read(arrayBuffer, { type: 'array' });
     const wsName = wb.SheetNames[0];
@@ -204,16 +207,22 @@ export class ExcelService {
 
     await db.animals.bulkPut(animals);
 
-    // Queue for sync
-    for (const a of animals) {
-      await syncEngine.queueAction('animal', 'create', a.id, a);
-    }
+    // Queue all imported animals in a single outbox transaction
+    await syncEngine.bulkQueueActions(
+      animals.map(a => ({
+        entityType: 'animal' as const,
+        actionType: 'create' as const,
+        entityId: a.id,
+        payload: a
+      }))
+    );
 
     return animals.length;
   }
 
   // Export current animal database to Excel
   public static async exportAnimalsToExcel(animals: Animal[]): Promise<Blob> {
+    const XLSX = await loadXlsx();
     const rows = animals.map(a => ({
       'Arete / Código': a.earTagCode,
       'Nombre': a.name || '',

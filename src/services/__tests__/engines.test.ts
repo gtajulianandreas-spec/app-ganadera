@@ -3,6 +3,8 @@ import { ReproductionEngine } from '../reproductionEngine';
 import { FinancialEngine } from '../financialEngine';
 import { StageTransitionEngine } from '../stageTransitionEngine';
 import { ExcelService, parseExcelDate } from '../excelService';
+import { computeSmartAlerts } from '../alertsEngine';
+import { VisualSearchService } from '../visualSearchService';
 import { SyncEngine } from '../../sync/engine';
 import type { Animal, StageTransitionConfig } from '../../types/animal';
 import type { FinancialRecord } from '../../types/finance';
@@ -203,5 +205,98 @@ describe('ExcelService Date Parsing (parseExcelDate)', () => {
   it('should fallback to 2022-01-01 for undefined or malformed values', () => {
     expect(parseExcelDate(undefined)).toBe('2022-01-01');
     expect(parseExcelDate('not-a-date')).toBe('2022-01-01');
+  });
+});
+
+describe('computeSmartAlerts', () => {
+  it('flags active milk/meat withdrawal and overdue dry-off alerts', () => {
+    const animalMap = new Map([
+      [
+        'a1',
+        {
+          id: 'a1',
+          earTagCode: 'V-101',
+          name: 'Lucero',
+          species: 'bovine' as const,
+          gender: 'female' as const,
+          birthDate: '2021-01-01',
+          currentStage: 'adult' as const,
+          purpose: 'milk' as const,
+          breedComposition: [],
+          farmId: 'farm-1',
+          status: 'active' as const,
+          createdAt: 1,
+          updatedAt: 1,
+          version: 1
+        }
+      ]
+    ]);
+
+    const alerts = computeSmartAlerts({
+      todayStr: '2026-11-25',
+      next15DaysStr: '2026-12-10',
+      animalMap,
+      healthRecords: [
+        {
+          id: 'h1',
+          farmId: 'farm-1',
+          animalId: 'a1',
+          date: '2026-11-24',
+          type: 'treatment',
+          treatmentName: 'Oxitetraciclina',
+          withdrawalDaysMilk: 4,
+          withdrawalDaysMeat: 21,
+          safeMilkDate: '2026-11-28',
+          safeMeatDate: '2026-12-15',
+          createdAt: 1
+        }
+      ],
+      reproEvents: [
+        {
+          id: 'r1',
+          farmId: 'farm-1',
+          animalId: 'a1',
+          eventType: 'pregnancy_check',
+          date: '2026-06-01',
+          pregnancyResult: 'pregnant',
+          mandatoryDryOffDate: '2026-11-20',
+          projectedCalvingDate: '2026-12-05',
+          createdAt: 1,
+          updatedAt: 1
+        }
+      ],
+      stageCandidates: []
+    });
+
+    expect(alerts.map(a => a.id)).toEqual(['alt_milk_h1', 'alt_meat_h1', 'alt_dry_r1', 'alt_calv_r1']);
+    expect(alerts.find(a => a.id === 'alt_dry_r1')?.severity).toBe('critical');
+  });
+});
+
+describe('VisualSearchService feature comparison', () => {
+  it('ranks closer feature vectors higher without requiring image re-decoding', () => {
+    const query = {
+      avgRed: 140,
+      avgGreen: 100,
+      avgBlue: 80,
+      brightness: 112,
+      dominantHue: 25,
+      histogram: new Array(24).fill(1 / 24),
+      aspectRatio: 1.33
+    };
+    const close = { ...query, brightness: 115, dominantHue: 28 };
+    const far = {
+      avgRed: 20,
+      avgGreen: 20,
+      avgBlue: 240,
+      brightness: 230,
+      dominantHue: 210,
+      histogram: new Array(24).fill(0),
+      aspectRatio: 1.0
+    };
+
+    expect(VisualSearchService.compareFeatures(query, close)).toBeGreaterThan(
+      VisualSearchService.compareFeatures(query, far)
+    );
   });
 });

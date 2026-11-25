@@ -19,7 +19,7 @@ import type { ReproductionEvent } from '../../types/reproduction';
 import type { Animal } from '../../types/animal';
 import { ReproductionEngine } from '../../services/reproductionEngine';
 import { db } from '../../db';
-import { syncEngine } from '../../sync/engine';
+import { saveEntityWithOutbox } from '../../db/mutations';
 import { generateId } from '../../utils/id';
 
 interface ReproductionDashboardProps {
@@ -124,8 +124,7 @@ export const ReproductionDashboard: React.FC<ReproductionDashboardProps> = ({
       updatedAt: Date.now()
     };
 
-    await db.reproductionEvents.put(newEvent);
-    await syncEngine.queueAction('reproduction', 'create', newEvent.id, newEvent);
+    await saveEntityWithOutbox(db.reproductionEvents, 'reproduction', 'create', newEvent);
 
     setShowEventModal(false);
     onRefresh();
@@ -148,8 +147,7 @@ export const ReproductionDashboard: React.FC<ReproductionDashboardProps> = ({
       updatedAt: Date.now()
     };
 
-    await db.reproductionEvents.put(newEvent);
-    await syncEngine.queueAction('reproduction', 'create', newEvent.id, newEvent);
+    await saveEntityWithOutbox(db.reproductionEvents, 'reproduction', 'create', newEvent);
 
     setShowDryOffModal(false);
     onRefresh();

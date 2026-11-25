@@ -32,8 +32,8 @@ export class AppGanaderaDatabase extends Dexie {
   backups!: EntityTable<BackupMetadata, 'id'>;
   settings!: EntityTable<FarmSettings, 'id'>;
 
-  constructor() {
-    super('AppGanaderaDB');
+  constructor(dbName: string = 'AppGanaderaDB') {
+    super(dbName);
 
     // Version 1 (Initial schema)
     this.version(1).stores({
@@ -101,4 +101,24 @@ export class AppGanaderaDatabase extends Dexie {
   }
 }
 
-export const db = new AppGanaderaDatabase();
+let activeDb = new AppGanaderaDatabase('AppGanaderaDB');
+
+/**
+ * Switches the active IndexedDB database to a user-scoped namespace
+ * (`AppGanaderaDB_<userId>`) to guarantee multi-tenant isolation on shared devices.
+ */
+export async function switchDatabaseTenant(userId: string | null): Promise<void> {
+  const targetName = userId ? `AppGanaderaDB_${userId}` : 'AppGanaderaDB';
+  if (activeDb.name === targetName) return;
+
+  activeDb.close();
+  activeDb = new AppGanaderaDatabase(targetName);
+  await activeDb.open();
+}
+
+export const db: AppGanaderaDatabase = new Proxy({} as AppGanaderaDatabase, {
+  get(_target, prop) {
+    const value = (activeDb as unknown as Record<string | symbol, unknown>)[prop];
+    return typeof value === 'function' ? value.bind(activeDb) : value;
+  }
+});

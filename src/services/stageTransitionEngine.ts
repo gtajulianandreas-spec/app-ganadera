@@ -104,22 +104,26 @@ export class StageTransitionEngine {
    * Applies the recommended stage transitions to selected animals in database.
    */
   static async applyTransitions(candidates: StageTransitionCandidate[]): Promise<number> {
-    let count = 0;
+    if (candidates.length === 0) return 0;
+
     const now = Date.now();
+    const updatedAnimals: Animal[] = candidates.map(candidate => ({
+      ...candidate.animal,
+      currentStage: candidate.recommendedStage,
+      updatedAt: now,
+      version: (candidate.animal.version || 1) + 1
+    }));
 
-    for (const candidate of candidates) {
-      const updatedAnimal: Animal = {
-        ...candidate.animal,
-        currentStage: candidate.recommendedStage,
-        updatedAt: now,
-        version: (candidate.animal.version || 1) + 1
-      };
+    await db.animals.bulkPut(updatedAnimals);
+    await syncEngine.bulkQueueActions(
+      updatedAnimals.map(updatedAnimal => ({
+        entityType: 'animal' as const,
+        actionType: 'update' as const,
+        entityId: updatedAnimal.id,
+        payload: updatedAnimal
+      }))
+    );
 
-      await db.animals.put(updatedAnimal);
-      await syncEngine.queueAction('animal', 'update', updatedAnimal.id, updatedAnimal);
-      count++;
-    }
-
-    return count;
+    return updatedAnimals.length;
   }
 }

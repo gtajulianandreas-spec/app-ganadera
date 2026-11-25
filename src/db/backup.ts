@@ -3,6 +3,7 @@ import type { BackupMetadata } from '../types/sync';
 
 export async function createFullBackup(description: string = 'Respaldo manual'): Promise<Blob> {
   const [
+    farms,
     animals,
     lots,
     pastures,
@@ -13,6 +14,7 @@ export async function createFullBackup(description: string = 'Respaldo manual'):
     financialRecords,
     settings
   ] = await Promise.all([
+    db.farms.toArray(),
     db.animals.toArray(),
     db.lots.toArray(),
     db.pastures.toArray(),
@@ -26,13 +28,14 @@ export async function createFullBackup(description: string = 'Respaldo manual'):
 
   const backupData = {
     metadata: {
-      version: '1.0.0',
+      version: '1.1.0',
       exportedAt: new Date().toISOString(),
       timestamp: Date.now(),
       description,
       app: 'APP GANADERA'
     },
     tables: {
+      farms,
       animals,
       lots,
       pastures,
@@ -92,6 +95,7 @@ export async function restoreFromBackup(file: File): Promise<{ success: boolean;
 
     // Atomic transaction for restoring all tables
     await db.transaction('rw', [
+      db.farms,
       db.animals,
       db.lots,
       db.pastures,
@@ -104,6 +108,7 @@ export async function restoreFromBackup(file: File): Promise<{ success: boolean;
     ], async () => {
       // Clear existing
       await Promise.all([
+        db.farms.clear(),
         db.animals.clear(),
         db.lots.clear(),
         db.pastures.clear(),
@@ -115,6 +120,7 @@ export async function restoreFromBackup(file: File): Promise<{ success: boolean;
       ]);
 
       // Bulk restore
+      if (data.tables.farms?.length) await db.farms.bulkPut(data.tables.farms);
       if (data.tables.animals?.length) await db.animals.bulkPut(data.tables.animals);
       if (data.tables.lots?.length) await db.lots.bulkPut(data.tables.lots);
       if (data.tables.pastures?.length) await db.pastures.bulkPut(data.tables.pastures);

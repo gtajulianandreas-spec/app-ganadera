@@ -18,7 +18,6 @@ import {
   Radio
 } from 'lucide-react';
 import type { Animal, Lot, Farm } from '../../types/animal';
-import { ExcelService } from '../../services/excelService';
 
 interface AnimalListProps {
   animals: Animal[];
@@ -73,6 +72,7 @@ export const AnimalList: React.FC<AnimalListProps> = ({
   }, [animals, searchTerm, selectedGender, selectedPurpose, selectedStage, selectedLotId]);
 
   const handleExportExcel = async () => {
+    const { ExcelService } = await import('../../services/excelService');
     const blob = await ExcelService.exportAnimalsToExcel(filteredAnimals);
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');

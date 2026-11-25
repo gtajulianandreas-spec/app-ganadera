@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import 'fake-indexeddb/auto';
-import { AppGanaderaDatabase } from '../index';
+import { AppGanaderaDatabase, db, switchDatabaseTenant } from '../index';
 import type { MilkingRecord } from '../../types/production';
 
 describe('Dexie v3 Database Schema (src/db/index.ts)', () => {
@@ -42,5 +42,26 @@ describe('Dexie v3 Database Schema (src/db/index.ts)', () => {
     expect(found.length).toBe(1);
     expect(found[0].id).toBe('milk-test-1');
     expect(found[0].liters).toBe(15.2);
+  });
+
+  it('isolates data across user-scoped tenants via switchDatabaseTenant', async () => {
+    await switchDatabaseTenant('user-a');
+    await db.farms.put({
+      id: 'farm-a',
+      name: 'Finca A',
+      ownerName: 'Ana',
+      country: 'Colombia',
+      currency: 'COP',
+      areaHectares: 50,
+      purpose: 'milk',
+      createdAt: 1,
+      updatedAt: 1,
+    });
+    expect(await db.farms.count()).toBe(1);
+
+    await switchDatabaseTenant('user-b');
+    expect(await db.farms.count()).toBe(0);
+
+    await switchDatabaseTenant(null);
   });
 });

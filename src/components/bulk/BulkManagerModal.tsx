@@ -33,8 +33,8 @@ export const BulkManagerModal: React.FC<BulkManagerModalProps> = ({
 
   const targetFarmId = currentFarmId && currentFarmId !== 'all' ? currentFarmId : 'farm-1';
 
-  const handleDownloadTemplate = () => {
-    const blob = ExcelService.generateTemplate();
+  const handleDownloadTemplate = async () => {
+    const blob = await ExcelService.generateTemplate();
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;

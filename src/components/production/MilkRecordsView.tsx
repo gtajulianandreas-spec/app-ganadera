@@ -12,7 +12,7 @@ import {
 import type { MilkingRecord } from '../../types/production';
 import type { Animal } from '../../types/animal';
 import { db } from '../../db';
-import { syncEngine } from '../../sync/engine';
+import { saveEntityWithOutbox } from '../../db/mutations';
 import { generateId } from '../../utils/id';
 
 interface MilkRecordsViewProps {
@@ -76,8 +76,7 @@ export const MilkRecordsView: React.FC<MilkRecordsViewProps> = ({
       createdAt: Date.now()
     };
 
-    await db.milkingRecords.put(newMilking);
-    await syncEngine.queueAction('milking', 'create', newMilking.id, newMilking);
+    await saveEntityWithOutbox(db.milkingRecords, 'milking', 'create', newMilking);
 
     setShowAddModal(false);
     onRefresh();

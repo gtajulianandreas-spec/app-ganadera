@@ -1,3 +1,5 @@
+import type { ImageFeatureVector } from '../services/visualSearchService';
+
 export interface StageTransitionConfig {
   calfMaxMonths: number;      // e.g. 7 meses: de 0 a 7 meses es ternero
   weanedMaxMonths: number;    // e.g. 14 meses: de 7 a 14 meses es destete / levante
@@ -65,6 +67,7 @@ export interface Animal {
   motherId?: string;
   fatherId?: string;
   photoUrl?: string;
+  photoFeatures?: ImageFeatureVector;
   qrCode?: string;
   gpsCoordinates?: GpsLocation;
   notes?: string;

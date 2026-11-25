@@ -3,26 +3,24 @@ import type { AiMessage, AiMode, HerdAnalysisSnapshot } from '../types/ai';
 import { FinancialEngine } from './financialEngine';
 
 export class AiAssistantService {
-  // Aggregate live herd metrics into a snapshot for AI context
-  public static async getHerdSnapshot(farmId: string = 'all'): Promise<HerdAnalysisSnapshot> {
-    const [allAnimals, allReproEvents, allMilkings, allWeights, allHealth, allFinancials] = await Promise.all([
-      db.animals.toArray(),
-      db.reproductionEvents.toArray(),
-      db.milkingRecords.toArray(),
-      db.weightRecords.toArray(),
-      db.healthRecords.toArray(),
-      db.financialRecords.toArray()
+  private static async loadFarmScopedCollections(farmId: string = 'all') {
+    const isScoped = farmId !== 'all';
+    const [animals, reproEvents, milkings, weights, health, financials] = await Promise.all([
+      isScoped ? db.animals.where('farmId').equals(farmId).toArray() : db.animals.toArray(),
+      isScoped ? db.reproductionEvents.where('farmId').equals(farmId).toArray() : db.reproductionEvents.toArray(),
+      isScoped ? db.milkingRecords.where('farmId').equals(farmId).toArray() : db.milkingRecords.toArray(),
+      isScoped ? db.weightRecords.where('farmId').equals(farmId).toArray() : db.weightRecords.toArray(),
+      isScoped ? db.healthRecords.where('farmId').equals(farmId).toArray() : db.healthRecords.toArray(),
+      isScoped ? db.financialRecords.where('farmId').equals(farmId).toArray() : db.financialRecords.toArray()
     ]);
 
-    // Filter by farm if not 'all'
-    const animals = farmId === 'all' ? allAnimals : allAnimals.filter(a => a.farmId === farmId);
-    const animalIdSet = new Set(animals.map(a => a.id));
+    return { animals, reproEvents, milkings, weights, health, financials };
+  }
 
-    const reproEvents = farmId === 'all' ? allReproEvents : allReproEvents.filter(r => animalIdSet.has(r.animalId));
-    const milkings = farmId === 'all' ? allMilkings : allMilkings.filter(m => animalIdSet.has(m.animalId));
-    const weights = farmId === 'all' ? allWeights : allWeights.filter(w => animalIdSet.has(w.animalId));
-    const health = farmId === 'all' ? allHealth : allHealth.filter(h => animalIdSet.has(h.animalId));
-    const financials = farmId === 'all' ? allFinancials : allFinancials.filter(f => f.farmId === farmId);
+  // Aggregate live herd metrics into a snapshot for AI context
+  public static async getHerdSnapshot(farmId: string = 'all'): Promise<HerdAnalysisSnapshot> {
+    const { animals, reproEvents, milkings, weights, health, financials } =
+      await this.loadFarmScopedCollections(farmId);
 
     const activeAnimals = animals.filter(a => a.status === 'active');
     const femalesCount = activeAnimals.filter(a => a.gender === 'female').length;
@@ -274,8 +272,8 @@ export class AiAssistantService {
 
     // 1. Inquiries about Calving / Partos
     if (promptLower.includes('parto') || promptLower.includes('calving') || promptLower.includes('nacer') || promptLower.includes('preñad')) {
-      const reproEvents = await db.reproductionEvents.where('pregnancyResult').equals('pregnant').toArray();
-      const animals = await db.animals.toArray();
+      const { reproEvents: scopedRepro, animals } = await this.loadFarmScopedCollections(farmId);
+      const reproEvents = scopedRepro.filter(r => r.pregnancyResult === 'pregnant');
       const animalMap = new Map(animals.map(a => [a.id, a]));
 
       const upcoming = reproEvents
@@ -331,9 +329,7 @@ export class AiAssistantService {
 
     // 3. Inquiries about Milk Production / Leche
     if (promptLower.includes('leche') || promptLower.includes('ordeño') || promptLower.includes('produccion') || promptLower.includes('litros')) {
-      const milkings = await db.milkingRecords.toArray();
-      const financials = await db.financialRecords.toArray();
-      const weights = await db.weightRecords.toArray();
+      const { milkings, financials, weights } = await this.loadFarmScopedCollections(farmId);
       const economics = FinancialEngine.calculateUnitEconomics(financials, milkings, weights);
 
       return {
@@ -377,9 +373,7 @@ export class AiAssistantService {
 
     // 5. Inquiries about Financials / Rentabilidad / Ganancias
     if (promptLower.includes('dinero') || promptLower.includes('finanza') || promptLower.includes('rentabilidad') || promptLower.includes('ganancia') || promptLower.includes('gasto') || promptLower.includes('utilidad')) {
-      const milkings = await db.milkingRecords.toArray();
-      const financials = await db.financialRecords.toArray();
-      const weights = await db.weightRecords.toArray();
+      const { milkings, financials, weights } = await this.loadFarmScopedCollections(farmId);
       const economics = FinancialEngine.calculateUnitEconomics(financials, milkings, weights);
 
       return {

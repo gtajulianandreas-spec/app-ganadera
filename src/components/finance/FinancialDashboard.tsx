@@ -24,8 +24,9 @@ import type { FinancialRecord, TransactionCategory } from '../../types/finance';
 import type { MilkingRecord, WeightRecord } from '../../types/production';
 import { FinancialEngine } from '../../services/financialEngine';
 import { db } from '../../db';
-import { syncEngine } from '../../sync/engine';
+import { saveEntityWithOutbox } from '../../db/mutations';
 import { generateId } from '../../utils/id';
+import { useFarmContext } from '../../context/FarmContext';
 
 interface FinancialDashboardProps {
   financials: FinancialRecord[];
@@ -40,6 +41,7 @@ export const FinancialDashboard: React.FC<FinancialDashboardProps> = ({
   weights,
   onRefresh
 }) => {
+  const { selectedFarmId } = useFarmContext();
   const [showAddModal, setShowAddModal] = useState(false);
   const [txType, setTxType] = useState<'income' | 'expense'>('income');
   const [txCategory, setTxCategory] = useState<TransactionCategory>('milk_sale');
@@ -63,7 +65,7 @@ export const FinancialDashboard: React.FC<FinancialDashboardProps> = ({
 
     const newRecord: FinancialRecord = {
       id: generateId('fin'),
-      farmId: 'default_farm',
+      farmId: selectedFarmId && selectedFarmId !== 'all' ? selectedFarmId : 'farm-1',
       date,
       type: txType,
       category: txCategory,
@@ -73,8 +75,7 @@ export const FinancialDashboard: React.FC<FinancialDashboardProps> = ({
       createdAt: Date.now()
     };
 
-    await db.financialRecords.put(newRecord);
-    await syncEngine.queueAction('finance', 'create', newRecord.id, newRecord);
+    await saveEntityWithOutbox(db.financialRecords, 'finance', 'create', newRecord);
 
     setShowAddModal(false);
     setDescription('');
