@@ -102,7 +102,7 @@ export const AnimalList: React.FC<AnimalListProps> = ({
           </p>
         </div>
 
-        <div className="grid grid-cols-2 sm:flex sm:flex-nowrap items-center gap-2 shrink-0">
+        <div className="grid grid-cols-2 sm:flex sm:flex-wrap lg:flex-nowrap items-center gap-2">
           {/* Primary Action */}
           <button
             onClick={onOpenCreate}

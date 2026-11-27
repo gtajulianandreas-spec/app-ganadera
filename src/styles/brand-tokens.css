@@ -1,0 +1,25 @@
+/* HATERRA Brand Tokens — v1.0 */
+:root {
+  color-scheme: light;
+  --ht-forest: #1A3627;
+  --ht-ranch: #294B38;
+  --ht-sage: #486456;
+  --ht-ivory: #E9E3D2;
+  --ht-brass: #B49A67;
+  --ht-canvas: #F6F5EF;
+  --ht-surface: #FFFFFF;
+  --ht-text: #202C25;
+  --ht-text-muted: #69766C;
+  --ht-border: #E5E3DA;
+  --ht-success: #3D7955;
+  --ht-warning: #C18B3C;
+  --ht-danger: #B65349;
+  --ht-info: #557A9C;
+  --ht-font-brand: "Cinzel", Georgia, serif;
+  --ht-font-heading: "Manrope", Arial, sans-serif;
+  --ht-font-body: "Inter", Arial, sans-serif;
+  --ht-radius-sm: 6px;
+  --ht-radius-md: 10px;
+  --ht-radius-lg: 14px;
+  --ht-radius-xl: 20px;
+}

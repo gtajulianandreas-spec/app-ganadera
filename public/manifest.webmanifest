@@ -1,14 +1,14 @@
 {
-  "name": "APP GANADERA - Control y Gestión Pecuaria Pro",
-  "short_name": "AppGanadera",
-  "description": "Sistema profesional de gestión de ganado, control lechero, ceba, reproducción y finanzas offline.",
+  "name": "HATERRA — Gestión Ganadera Integral",
+  "short_name": "HATERRA",
+  "description": "La esencia del campo, bajo control.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "display_override": ["window-controls-overlay", "standalone"],
   "orientation": "portrait",
-  "background_color": "#f8fafc",
-  "theme_color": "#15803d",
+  "background_color": "#F6F5EF",
+  "theme_color": "#1A3627",
   "icons": [
     {
       "src": "/icons/icon-96.png",
@@ -28,7 +28,7 @@
       "purpose": "any maskable"
     },
     {
-      "src": "/icons/icon.svg",
+      "src": "/icons/haterra-app-icon.svg",
       "sizes": "any",
       "type": "image/svg+xml"
     }
@@ -50,7 +50,7 @@
     },
     {
       "name": "Asistente IA",
-      "short_name": "IA Ganadera",
+      "short_name": "IA HATERRA",
       "description": "Consultar al Asistente Inteligente",
       "url": "/?action=ai_chat",
       "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]

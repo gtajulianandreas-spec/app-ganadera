@@ -32,7 +32,7 @@ export async function createFullBackup(description: string = 'Respaldo manual'):
       exportedAt: new Date().toISOString(),
       timestamp: Date.now(),
       description,
-      app: 'APP GANADERA'
+      app: 'HATERRA'
     },
     tables: {
       farms,
@@ -89,8 +89,8 @@ export async function restoreFromBackup(file: File): Promise<{ success: boolean;
     const text = await file.text();
     const data = JSON.parse(text);
 
-    if (!data.tables || !data.metadata || data.metadata.app !== 'APP GANADERA') {
-      throw new Error('El archivo seleccionado no es un respaldo válido de APP GANADERA');
+    if (!data.tables || !data.metadata || !['HATERRA', 'APP GANADERA'].includes(data.metadata.app)) {
+      throw new Error('El archivo seleccionado no es un respaldo válido de HATERRA');
     }
 
     // Atomic transaction for restoring all tables

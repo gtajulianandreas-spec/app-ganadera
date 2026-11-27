@@ -259,13 +259,15 @@ export const App: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-6 text-center">
-        <div className="w-14 h-14 rounded-2xl bg-ranch-600 text-white flex items-center justify-center font-bold text-2xl shadow-lg animate-pulse mb-4">
-          AG
-        </div>
-        <h2 className="text-xl font-bold text-gray-900 tracking-tight">Cargando APP GANADERA...</h2>
-        <p className="text-sm text-gray-500 mt-1 max-w-sm">
-          Inicializando base de datos local Dexie con soporte PWA Móvil y Perfiles Profesionales
+      <div className="min-h-screen bg-[#F6F5EF] flex flex-col items-center justify-center p-6 text-center">
+        <img
+          src="/brand/haterra-lockup-stacked-light.svg"
+          alt="HATERRA"
+          className="h-24 w-auto rounded-2xl mb-4 animate-pulse object-contain"
+        />
+        <h2 className="text-lg font-bold text-[#1A3627] tracking-tight">Cargando HATERRA...</h2>
+        <p className="text-sm text-[#69766C] mt-1 max-w-sm">
+          La esencia del campo, bajo control. Inicializando base de datos local offline-first.
         </p>
       </div>
     );
@@ -274,7 +276,7 @@ export const App: React.FC = () => {
   // Core App UI Content
   const appContent = (
     <FarmProvider value={farmContextValue}>
-      <div className="min-h-screen bg-gray-50 flex flex-col antialiased pb-24 md:pb-8">
+      <div className="min-h-screen bg-[#F6F5EF] flex flex-col antialiased pb-24 md:pb-8">
         {/* Top Application Bar with Multi-Farm and Role Selector */}
         <Navbar
           onOpenCreateFarm={() => setIsCreateFarmOpen(true)}

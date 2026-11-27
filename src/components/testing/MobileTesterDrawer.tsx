@@ -462,7 +462,7 @@ export const MobileTesterDrawer: React.FC<MobileTesterDrawerProps> = ({
 
         {/* Footer */}
         <div className="p-4 border-t border-gray-200 bg-gray-50 flex items-center justify-between text-[11px] text-gray-500">
-          <span>APP GANADERA QA Suite v1.0</span>
+          <span>HATERRA QA Suite v1.0</span>
           <button onClick={onClose} className="font-bold text-purple-700 hover:underline">
             Cerrar Panel
           </button>

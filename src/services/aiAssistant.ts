@@ -401,7 +401,7 @@ export class AiAssistantService {
       sender: 'assistant',
       timestamp: Date.now(),
       mode: 'farm_local',
-      text: `Hola, soy tu **Asistente Inteligente de APP GANADERA**.\n\n📌 *Estado actual del hato:*\n• **${snapshot.totalAnimals} animales activos** (${snapshot.femalesCount} hembras, ${snapshot.malesCount} machos).\n• **${snapshot.pregnantCowsCount} vacas preñadas** con **${snapshot.upcomingCalvingsCount} partos próximos**.\n• **${snapshot.pendingDryOffCount} vacas en fecha de secado obligatorio**.\n• **${snapshot.avgDailyMilkLiters} L/día** de producción lechera promedio.\n• **Utilidad neta registrada:** **$${snapshot.monthlyNetProfit.toLocaleString()} USD**.\n\nPuedes hacerme preguntas sobre **tu hato** o activar el **Consultor Global** para preguntas zootécnicas externas (fármacos, IATF, pasturas, formulación de dietas).`,
+      text: `Hola, soy tu **Asistente Inteligente de HATERRA**.\n\n📌 *Estado actual del hato:*\n• **${snapshot.totalAnimals} animales activos** (${snapshot.femalesCount} hembras, ${snapshot.malesCount} machos).\n• **${snapshot.pregnantCowsCount} vacas preñadas** con **${snapshot.upcomingCalvingsCount} partos próximos**.\n• **${snapshot.pendingDryOffCount} vacas en fecha de secado obligatorio**.\n• **${snapshot.avgDailyMilkLiters} L/día** de producción lechera promedio.\n• **Utilidad neta registrada:** **$${snapshot.monthlyNetProfit.toLocaleString()} USD**.\n\nPuedes hacerme preguntas sobre **tu hato** o activar el **Consultor Global** para preguntas zootécnicas externas (fármacos, IATF, pasturas, formulación de dietas).`,
       dataCard: {
         type: 'reproduction_alert',
         title: 'Ficha Resumen del Hato',

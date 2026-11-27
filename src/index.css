@@ -1,12 +1,21 @@
+@import './styles/brand-tokens.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   body {
-    @apply antialiased bg-gray-50/90 text-gray-900 font-sans;
+    @apply antialiased font-sans;
+    background-color: var(--ht-canvas);
+    color: var(--ht-text);
+    font-family: var(--ht-font-body);
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
     -webkit-tap-highlight-color: transparent;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--ht-font-heading);
   }
 
   button:focus-visible,
@@ -14,7 +23,8 @@
   input:focus-visible,
   select:focus-visible,
   textarea:focus-visible {
-    @apply outline-none ring-2 ring-ranch-500/40 ring-offset-1;
+    @apply outline-none ring-2 ring-offset-1;
+    --tw-ring-color: rgba(26, 54, 39, 0.35);
   }
 }
 
@@ -37,12 +47,12 @@
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: var(--ht-canvas);
 }
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: #c8c5b8;
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: var(--ht-sage);
 }

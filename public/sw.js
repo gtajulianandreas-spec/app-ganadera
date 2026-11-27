@@ -1,12 +1,17 @@
-const CACHE_NAME = 'app-ganadera-v4';
+const CACHE_NAME = 'haterra-v5';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
-  '/manifest.json',
+  '/manifest.webmanifest',
   '/favicon.svg',
-  '/icons/icon.svg',
+  '/favicon.ico',
+  '/apple-touch-icon.png',
+  '/icons/haterra-app-icon.svg',
   '/icons/icon-192.png',
-  '/icons/icon-512.png'
+  '/icons/icon-512.png',
+  '/brand/haterra-lockup-horizontal-light.svg',
+  '/brand/haterra-lockup-horizontal-dark.svg',
+  '/brand/haterra-mark-transparent.svg'
 ];
 
 // Install: Cache critical static shell

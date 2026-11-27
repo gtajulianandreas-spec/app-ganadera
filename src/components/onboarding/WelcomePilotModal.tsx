@@ -46,19 +46,21 @@ export const WelcomePilotModal: React.FC<WelcomePilotModalProps> = ({
       <div className="bg-white rounded-3xl max-w-lg w-full shadow-2xl border border-gray-100 overflow-hidden flex flex-col max-h-[92vh] animate-in fade-in zoom-in-95 duration-200">
         
         {/* Hero Header */}
-        <div className="bg-gradient-to-br from-ranch-800 via-ranch-700 to-emerald-800 text-white p-6 text-center relative overflow-hidden">
-          <div className="w-16 h-16 rounded-3xl bg-white/10 backdrop-blur-md mx-auto flex items-center justify-center text-3xl font-extrabold shadow-inner border border-white/20 mb-3">
-            🐮
-          </div>
-          <span className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-yellow-400/20 text-yellow-300 text-[11px] font-extrabold border border-yellow-300/30 uppercase tracking-wider mb-2">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Versión Piloto de Evaluación</span>
+        <div className="bg-[#1A3627] text-white p-6 text-center relative overflow-hidden">
+          <img
+            src="/brand/haterra-lockup-stacked-dark.svg"
+            alt="HATERRA"
+            className="h-24 w-auto mx-auto mb-3 object-contain"
+          />
+          <span className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-[#B49A67]/20 text-[#E9E3D2] text-[11px] font-bold border border-[#B49A67]/40 uppercase tracking-wider mb-2">
+            <Sparkles className="w-3.5 h-3.5 text-[#B49A67]" />
+            <span>Edición Campo &amp; Nube</span>
           </span>
-          <h2 className="text-xl sm:text-2xl font-black tracking-tight">
-            ¡Bienvenido a APP GANADERA!
+          <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight text-white">
+            ¡Bienvenido a HATERRA!
           </h2>
-          <p className="text-xs text-emerald-100 mt-1 max-w-sm mx-auto leading-relaxed">
-            Plataforma profesional para la gestión técnica, reproductiva y financiera de tu hato.
+          <p className="text-xs text-[#E9E3D2]/85 mt-1 max-w-sm mx-auto leading-relaxed">
+            La esencia del campo, bajo control. Gestión técnica, reproductiva y financiera de tu hato.
           </p>
         </div>
 

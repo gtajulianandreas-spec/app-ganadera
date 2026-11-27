@@ -67,7 +67,7 @@ export const ShareAndFeedbackModal: React.FC<ShareAndFeedbackModalProps> = ({
     };
   }, [farms, animals, currentFarmId]);
 
-  const invitationMessage = `🐮 *¡Hola colega ganadero!* Te invito a probar la versión piloto de *APP GANADERA*.
+  const invitationMessage = `🐄 *¡Hola colega ganadero!* Te invito a probar *HATERRA*.
 📲 Funciona directamente desde el navegador de tu celular y puedes usarla en el potrero sin internet:
 🔗 ${currentUrl}
 _Al abrirla, puedes instalarla en tu pantalla de inicio en 1 toque._`;
@@ -79,7 +79,7 @@ _Al abrirla, puedes instalarla en tu pantalla de inicio en 1 toque._`;
   };
 
   const handleSendWhatsAppFeedback = () => {
-    const feedbackText = `📋 *FEEDBACK DE EVALUADOR - APP GANADERA*
+    const feedbackText = `📋 *FEEDBACK DE EVALUADOR - HATERRA*
 👤 *Evaluador:* ${testerName.trim() || 'Ganadero Anónimo'} ${testerPhone ? `(${testerPhone})` : ''}
 ⭐ *Calificación:* ${rating} / 5 estrellas
 🎯 *Módulo Probado:* ${testedModule}
@@ -181,7 +181,7 @@ ${suggestedFeature.trim() || 'Ninguna por ahora.'}
               <div className="space-y-2 flex-1">
                 <h4 className="font-bold text-gray-900 text-sm">Escanea para Probar en tu Teléfono</h4>
                 <p className="text-[11px] text-gray-500 leading-tight">
-                  Apunta con la cámara de tu celular a este código QR para abrir APP GANADERA al instante sin descargar nada.
+                  Apunta con la cámara de tu celular a este código QR para abrir HATERRA al instante sin descargar nada.
                 </p>
 
                 <div className="pt-2 flex flex-col sm:flex-row gap-2">

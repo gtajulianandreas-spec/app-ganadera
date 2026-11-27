@@ -223,20 +223,22 @@ export const AuthModal: React.FC<AuthModalProps> = ({ initialMode = 'login', onC
     <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-gray-200 overflow-hidden">
         {/* Header */}
-        <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-gray-50/70">
-          <div className="flex items-center space-x-2.5">
-            <div className="w-8 h-8 rounded-xl bg-ranch-600 text-white flex items-center justify-center font-bold text-sm">
-              AG
-            </div>
-            <div>
-              <h2 className="text-base font-bold text-gray-900">
+        <div className="px-6 py-4 border-b border-[#294B38] flex items-center justify-between bg-[#1A3627] text-[#E9E3D2]">
+          <div className="flex items-center space-x-3">
+            <img
+              src="/brand/haterra-lockup-horizontal-dark.svg"
+              alt="HATERRA"
+              className="h-9 w-auto object-contain shrink-0"
+            />
+            <div className="border-l border-[#486456] pl-3">
+              <h2 className="text-sm sm:text-base font-bold text-white">
                 {mode === 'login' && 'Iniciar Sesión'}
                 {mode === 'register' && 'Crear Cuenta Ganadera'}
                 {mode === 'forgot' && 'Recuperar Contraseña'}
                 {mode === 'reset' && 'Nueva Contraseña'}
                 {mode === 'verify' && 'Verificación de Correo'}
               </h2>
-              <p className="text-[11px] text-gray-500">Acceso seguro y cifrado para tu hacienda</p>
+              <p className="text-[11px] text-[#E9E3D2]/80">Acceso seguro y cifrado para tu hacienda</p>
             </div>
           </div>
           <button
@@ -244,7 +246,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ initialMode = 'login', onC
               clearUrlAuthParams();
               onClose();
             }}
-            className="p-1.5 rounded-xl text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
+            className="p-1.5 rounded-xl text-[#E9E3D2]/75 hover:text-white hover:bg-[#294B38] transition-colors"
             aria-label="Cerrar modal de autenticación"
           >
             <X className="w-5 h-5" />

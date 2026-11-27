@@ -158,8 +158,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </div>
 
       {/* Footer Info */}
-      <div className="px-4 py-3 border-t border-gray-100 bg-gray-50/70 text-[11px] text-gray-500 flex items-center justify-between">
-        <span className="font-medium">APP GANADERA v1.0</span>
+      <div className="px-4 py-3 border-t border-[#E5E3DA] bg-[#F6F5EF]/70 text-[11px] text-[#69766C] flex items-center justify-between">
+        <span className="font-semibold text-[#1A3627] flex items-center space-x-1.5">
+          <img src="/brand/haterra-mark-transparent.svg" alt="" aria-hidden="true" className="h-3.5 w-auto object-contain" />
+          <span>HATERRA v1.0</span>
+        </span>
         <span className="flex items-center text-emerald-700 font-semibold">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5"></span>
           Offline Ready

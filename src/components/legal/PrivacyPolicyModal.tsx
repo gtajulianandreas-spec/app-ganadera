@@ -48,7 +48,7 @@ export const PrivacyPolicyModal: React.FC<PrivacyPolicyModalProps> = ({ onClose 
               <span>1. Responsable y Marco Normativo</span>
             </h3>
             <p>
-              El tratamiento de los datos personales recolectados a través de <strong>APP GANADERA</strong> se rige por
+              El tratamiento de los datos personales recolectados a través de <strong>HATERRA</strong> se rige por
               la <strong>Ley Estatutaria 1581 de 2012</strong>, el <strong>Decreto Único Reglamentario 1074 de 2015</strong>{' '}
               y los lineamientos de la Superintendencia de Industria y Comercio (SIC) de la República de Colombia, así
               como por principios equivalentes del Reglamento General de Protección de Datos (RGPD) cuando aplique.

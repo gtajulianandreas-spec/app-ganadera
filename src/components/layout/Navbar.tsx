@@ -163,15 +163,22 @@ export const Navbar: React.FC<NavbarProps> = ({
   const roleInfo = USER_ROLES[effectiveRole];
 
   return (
-    <header className="bg-white border-b border-gray-200 sticky top-0 z-30 shadow-xs safe-top">
+    <header className="bg-white/95 backdrop-blur-sm border-b border-[#E5E3DA] sticky top-0 z-30 shadow-xs safe-top">
       <div className="max-w-7xl mx-auto px-2.5 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-14 sm:h-16 gap-2">
           
-          {/* Logo & Farm Selector (Left Group) */}
-          <div className="flex items-center space-x-1.5 sm:space-x-2.5 min-w-0 shrink">
-            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-ranch-600 flex items-center justify-center text-white shadow-xs font-bold text-sm sm:text-base tracking-tight shrink-0">
-              AG
-            </div>
+          {/* HATERRA Brand Logo & Farm Selector (Left Group) */}
+          <div className="flex items-center space-x-2 sm:space-x-3 min-w-0 shrink">
+            <img
+              src="/brand/haterra-lockup-horizontal-light.svg"
+              alt="HATERRA"
+              className="hidden sm:block h-9 w-auto rounded-lg object-contain shrink-0"
+            />
+            <img
+              src="/brand/haterra-mark-transparent.svg"
+              alt="HATERRA"
+              className="sm:hidden h-8 w-auto object-contain shrink-0"
+            />
 
             {/* Farm Selector Pill with Dropdown */}
             <div className="relative min-w-0" ref={dropdownRef}>
